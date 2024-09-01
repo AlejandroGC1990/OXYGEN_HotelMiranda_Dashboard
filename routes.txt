@@ -1,0 +1,18 @@
+/bookings - Listar todas las reservas
+/bookings/:id - Detalle de una reserva específica
+/bookings/new - Crear una nueva reserva
+/bookings/:id/edit - Editar una reserva específica
+/bookings/:id/delete - Eliminar una reserva específica
+
+/rooms - Listar todas las habitaciones
+/rooms/:id - Detalle de una habitación específica
+/rooms/new - Crear una nueva habitación
+/rooms/:id/delete - Eliminar una habitación específica
+
+/users - Listar todos los usuarios
+/users/:id - Detalle de un usuario específico
+/users/new - Crear un nuevo usuario
+/users/:id/edit - Editar un usuario específico
+/users/:id/delete - Eliminar un usuario específico
+
+/contact - Página de contacto
