@@ -1,8 +1,24 @@
+.layout {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  background-color: greenyellow;
+}
+.layout__container {
+  display: flex;
+  flex-direction: column;
+  background-color: greenyellow;
+}
+
 .lateralMenu {
   display: flex;
   flex-direction: column;
   width: 20em;
   background-color: aqua;
+}
+
+.nav {
+  background-color: pink;
 }
 
 * {

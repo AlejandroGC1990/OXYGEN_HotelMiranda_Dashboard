@@ -1,0 +1,12 @@
+.layout {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    background-color: greenyellow;
+    
+    &__container{
+        display: flex;
+        flex-direction: column;
+        background-color: greenyellow;
+    }
+}

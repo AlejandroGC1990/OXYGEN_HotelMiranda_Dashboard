@@ -21,6 +21,12 @@ const LateralMenu = () => {
           <p>Concierge</p>
         </Link>
       </div>
+      <div className="lateralMenu__containerUser">
+        <img src="" />
+        <p>Name</p>
+        <p>Email</p>
+        <button>Edit</button>
+      </div>
       <div className="lateralMenu__footerLateralMenu">
         <p>Travl Hotel Admin Dashboard</p>
         <p>@2020 All Right Reserved</p>

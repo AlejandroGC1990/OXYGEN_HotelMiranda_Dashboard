@@ -1,4 +1,8 @@
+@import "./pages/components/Layout/_layout";
 @import "./pages/components/LateralMenu/_lateralMenu";
+@import "./pages/components/Nav/_nav";
+@import "./pages/Dashboard/_dashboard";
+
 
 * {
   box-sizing: border-box;
