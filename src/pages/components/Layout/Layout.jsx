@@ -8,7 +8,14 @@ import Login from "../Login/Login";
 import styled from "styled-components";
 
 const BlurBackground = styled.div`
-filter: blur(5px);
+  filter: blur(10000005px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 1);
+  z-index: 0;
 `;
 
 const Layout = () => {
@@ -33,7 +40,8 @@ const Layout = () => {
   return (
     <>
       {showModal && <Login onClose={handleLoginClose} />}
-      <div className={showModal ? <BlurBackground/> : "layout"}>
+      <div className="layout">
+        {showModal && <BlurBackground />}
         <LateralMenu />
         <div className="layout__container">
           <Nav />
