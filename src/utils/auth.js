@@ -1,26 +1,36 @@
-import bcrypt from "bcryptjs";
+import CryptoJS from "crypto-js";
 
-const users = [{
-    userName: "admin",
-    password: bcrypt.hashSync("password123", 10)
-}];
+const secretKey = "patata5678";
 
-export const login =({ userName, password}) => {
-    const user = users.find(user => user.userName === userName);
+const users = [
+  {
+    username: "admin",
+    password: CryptoJS.AES.encrypt("password1234", secretKey).toString(),
+  },
+];
 
-    if(user && bcrypt.compareSync(password, user.password)) {
-        //Guardar ususario en localStorage
-        localStorage.setItem("user", JSON.stringify({userName}));
-        return true;
+export const login = ({ userName, password }) => {
+  const user = users.find((user) => user.userName === userName);
+
+  if (user) {
+    const decryptedPassword = CryptoJS.AES.decrypt(
+      user.password,
+      secretKey
+    ).toString(CryptoJS.enc.Utf8);
+
+    if (password === decryptedPassword) {
+      localStorage.setItem("user", JSON.stringify({ userName }));
+      return true;
     }
+  }
 
-    return false;
+  return false;
 };
 
 export const isAuthenticated = () => {
-    return localStorage.getItem("user") !== null;
+  return localStorage.getItem("user") !== null;
 };
 
 export const logout = () => {
-    localStorage.removeItem("user");
+  localStorage.removeItem("user");
 };

@@ -6,7 +6,7 @@ import Rooms from "./pages/Rooms";
 import Guest from "./pages/Guest";
 import GuestDetail from "./pages/GuestDetail";
 import Concierge from "./pages/Concierge";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard/Dashboard";
 import Layout from "./pages/components/Layout/Layout";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
