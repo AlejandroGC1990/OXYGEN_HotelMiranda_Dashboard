@@ -5,9 +5,9 @@ import Bookings from "./pages/Bookings";
 import Rooms from "./pages/Rooms";
 import Guest from "./pages/Guest";
 import GuestDetail from "./pages/GuestDetail";
-import Contact from "./pages/Concierge";
-import Dashboard from "./pages/Dashboard";
-import Layout from "./pages/components/Layout";
+import Concierge from "./pages/Concierge";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import Layout from "./pages/components/Layout/Layout";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -16,7 +16,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="bookings" element={<Bookings />} />
-          <Route path="contact" element={<Contact />} />
+          <Route path="concierge" element={<Concierge />} />
           <Route path="rooms" element={<Rooms />} />
           <Route path="guest" element={<Guest />} />
           <Route path="guestDetail" element={<GuestDetail />} />
