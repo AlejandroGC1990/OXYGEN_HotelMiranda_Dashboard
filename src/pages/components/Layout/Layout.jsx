@@ -8,7 +8,7 @@ import Login from "../Login/Login";
 import styled from "styled-components";
 
 const BlurBackground = styled.div`
-  filter: blur(10000005px);
+  filter: blur(500px);
   position: absolute;
   top: 0;
   left: 0;

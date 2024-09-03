@@ -1,71 +1,13 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
-import styled from "styled-components";
 import { login } from "../../../utils/auth";
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 5;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 300px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-`;
-
-const Title = styled.h2`
-  margin-bottom: 20px;
-  text-align: center;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Label = styled.label`
-  margin-bottom: 5px;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-`;
-
-const Button = styled.button`
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
-const Error = styled.p`
-  color: red;
-  text-align: center;
-`;
+import "./__login.scss";
 
 const Login = ({ onClose }) => {
-  const [credentials, setCredentials] = useState({ username: "", password: "" });
+  const [credentials, setCredentials] = useState({
+    username: "",
+    password: "",
+  });
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
@@ -75,30 +17,48 @@ const Login = ({ onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (login(credentials)) {
-      onClose(); 
+      onClose();
     } else {
       setError("Usuario o contraseña incorrectos");
     }
   };
 
   return (
-    <ModalOverlay>
-      <ModalContent>
-        <Title>Iniciar Sesión</Title>
-        {error && <Error>{error}</Error>}
-        <Form onSubmit={handleSubmit}>
+    <div className="modalOverlay">
+      <div className="modalOverlay__content">
+        <h2 className="modalOverlay__content__title">Iniciar Sesión</h2>
+
+        {error && <div className="modalOverlay__content__error">{error}</div>}
+        <form className="modalOverlay__content__form" onSubmit={handleSubmit}>
           <div>
-            <Label>Usuario:</Label>
-            <Input type="text" name="username" onChange={handleChange} required />
+            <label className="modalOverlay__content__label">Usuario:</label>
+            <input
+              className="modalOverlay__content__input"
+              type="text"
+              name="username"
+              onChange={handleChange}
+              required
+            />
           </div>
           <div>
-            <Label>Contraseña:</Label>
-            <Input type="password" name="password" onChange={handleChange} required />
+            <label className="modalOverlay__content__label">Contraseña:</label>
+            <input
+              className="modalOverlay__content__input"
+              type="password"
+              name="password"
+              onChange={handleChange}
+              required
+            />
+            <button
+              className="modalOverlay__content__form__button"
+              type="submit"
+            >
+              Iniciar Sesión
+            </button>
           </div>
-          <Button type="submit">Iniciar Sesión</Button>
-        </Form>
-      </ModalContent>
-    </ModalOverlay>
+        </form>
+      </div>
+    </div>
   );
 };
 

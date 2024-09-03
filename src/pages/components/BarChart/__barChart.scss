@@ -1,0 +1,35 @@
+:root {
+  overflow: hidden;
+  font-family: -apple-system, "system-ui", "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --button-background-color: transparent;
+  --button-text-color: #212529;
+  --button-color-border-primary: #d0d5dd;
+  --button-hover-background-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-dark-mode="true"] {
+  background: #192232;
+  color: white;
+
+  --button-text-color: #f8f9fa;
+  --button-color-border-primary: rgba(255, 255, 255, 0.2);
+  --button-hover-background-color: #2a343e;
+}
+
+:root,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: grid;
+  grid-auto-rows: minmax(0, 1fr);
+  grid-auto-columns: minmax(0, 1fr);
+  padding: 1rem;
+}
