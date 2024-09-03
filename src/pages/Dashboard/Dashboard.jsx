@@ -1,3 +1,5 @@
+import VisitorBarChart from "../components/BarChart/BarChart";
+// import BarChart from "../components/BarChart/BarChart";
 import HotelCalendar from "../components/Calendar/Calendar";
 import "./__dashboard.scss";
 
@@ -49,6 +51,8 @@ const Dashboard = () => {
 
       <div className="dashboard_containerCalendar&ReservStats">
       <HotelCalendar />
+      {/* <BarChart /> */}
+      <VisitorBarChart />
       </div>
     </div>
   );

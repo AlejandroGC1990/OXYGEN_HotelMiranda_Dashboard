@@ -7,16 +7,15 @@ const HotelCalendar = () => {
 
     const handleDateChange = (newDate) => {
         setDate(newDate);
-        // Aquí puedes añadir la lógica para manejar la reserva de recursos o bloqueos de fechas
     };
 
     return (
         <div>
-            <h1>Gestión de Recursos del Hotel</h1>
+            <h1>Recent Booking Schedule</h1>
             <Calendar
                 onChange={handleDateChange}
                 value={date}
-                minDate={new Date()} // Puedes configurar la fecha mínima
+                minDate={new Date()}
             />
         </div>
     );
