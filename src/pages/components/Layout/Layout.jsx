@@ -6,7 +6,7 @@ import { isAuthenticated } from "../../../utils/auth";
 import { useEffect, useState } from "react";
 
 const Layout = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {

@@ -1,12 +1,12 @@
-import VisitorBarChart from "../components/BarChart/BarChart";
-// import BarChart from "../components/BarChart/BarChart";
-import HotelCalendar from "../components/Calendar/Calendar";
+// import VisitorBarChart from "../components/BarChart/BarChart";
+// import HotelCalendar from "../components/Calendar/Calendar";
+import Table from "../components/Table/Table";
 import "./__dashboard.scss";
 
 const Dashboard = () => {
   return (
     <div className="dashboard">
-      <h1>Dashboard</h1>
+      {/* <h1>Dashboard</h1>
       <div className="dashboard__containerKPIs">
         <div className="dashboard__containerKPIs__pack">
           <div className="dashboard__containerKPIs__pack__img">
@@ -47,12 +47,12 @@ const Dashboard = () => {
             <p>Check out</p>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="dashboard_containerCalendar&ReservStats">
-      <HotelCalendar />
-      {/* <BarChart /> */}
-      <VisitorBarChart />
+      {/* <HotelCalendar />
+      <VisitorBarChart /> */}
+      <Table />
       </div>
     </div>
   );
