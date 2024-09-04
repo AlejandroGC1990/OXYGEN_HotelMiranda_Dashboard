@@ -3,9 +3,10 @@ import LateralMenu from "../LateralMenu/LateralMenu";
 import Nav from "../Nav/Nav";
 import "./__layout.scss";
 import { isAuthenticated } from "../../../utils/auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Layout = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,16 +15,20 @@ const Layout = () => {
     }
   }, [navigate]);
 
+  const toggleMenu = (isOpen) => {
+    setIsMenuOpen(isOpen);
+  };
+
   return (
-      <div className="layout">
-        <LateralMenu />
-        <div className="layout__container">
-          <Nav />
-          <main className="layout__container__main">
-            <Outlet />
-          </main>
-        </div>
+    <div className="layout">
+      <LateralMenu isOpen={isMenuOpen}/>
+      <div className={`layout__container ${isMenuOpen ? 'menu-open' : ''}`}>
+        <Nav toggleMenu={toggleMenu} />
+        <main className="layout__container__main">
+          <Outlet />
+        </main>
       </div>
+    </div>
   );
 };
 

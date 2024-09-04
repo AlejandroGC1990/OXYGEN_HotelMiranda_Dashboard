@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import "./__lateralMenu.scss";
+import PropTypes from "prop-types";
 
-const LateralMenu = () => {
+const LateralMenu = ({ isOpen }) => {
   return (
-    <div className="lateralMenu">
+    <div className={`lateralMenu ${isOpen ? 'open' : 'closed'}`}>
+    {/* <div className="lateralMenu"> */}
       <div className="lateralMenu__sections">
         <Link to="/" className="lateralMenu__sections__pack">
           <p>Dashboard</p>
@@ -33,6 +35,10 @@ const LateralMenu = () => {
       </div>
     </div>
   );
+};
+
+LateralMenu.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
 };
 
 export default LateralMenu;

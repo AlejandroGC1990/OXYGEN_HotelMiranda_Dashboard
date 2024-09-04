@@ -1,6 +1,24 @@
-.lateralMenu{
-    display: flex;
-    flex-direction: column;
-    width: 20em;
-    background-color: aqua;
+.lateralMenu {
+  display: flex;
+  flex-direction: column;
+  width: 0; 
+  background-color: aqua;
+  height: 100%;  
+  overflow: hidden;  
+  transition: width 0.3s ease-in-out;
+}
+
+.lateralMenu.open {
+  width: 20em;  
+}
+
+.layout__container {
+  display: flex;
+  flex-grow: 1;
+  transition: margin-left 0.3s ease-in-out;  
+  margin-left: 0;  
+}
+
+.layout__container.menu-open {
+  margin-left: 0em; 
 }
