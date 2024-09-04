@@ -5,7 +5,6 @@ import PropTypes from "prop-types";
 const LateralMenu = ({ isOpen }) => {
   return (
     <div className={`lateralMenu ${isOpen ? 'open' : 'closed'}`}>
-    {/* <div className="lateralMenu"> */}
       <div className="lateralMenu__sections">
         <Link to="/" className="lateralMenu__sections__pack">
           <p>Dashboard</p>
