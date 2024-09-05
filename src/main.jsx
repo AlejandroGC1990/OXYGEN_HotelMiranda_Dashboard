@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login/Login";
-import Bookings from "./pages/Bookings";
+import Bookings from "./pages/Booking/Bookings";
 import Rooms from "./pages/Rooms";
 import Guest from "./pages/Guest";
 import Concierge from "./pages/Concierge";
