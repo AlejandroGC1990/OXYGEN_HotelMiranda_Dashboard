@@ -1,9 +1,11 @@
 // import VisitorBarChart from "../components/BarChart/BarChart";
 // import HotelCalendar from "../components/Calendar/Calendar";
-import Table from "../components/Table/Table";
+import { useState } from "react";
+import TableComponent from "../components/Table/Table";
 import "./__dashboard.scss";
 
 const Dashboard = () => {
+  const [currentPage, setCurrentPage] = useState("dashboard");
   return (
     <div className="dashboard">
       {/* <h1>Dashboard</h1>
@@ -50,9 +52,9 @@ const Dashboard = () => {
       </div> */}
 
       <div className="dashboard_containerCalendar&ReservStats">
-      {/* <HotelCalendar />
+        {/* <HotelCalendar />
       <VisitorBarChart /> */}
-      <Table />
+        <TableComponent currentPage={currentPage} />
       </div>
     </div>
   );
