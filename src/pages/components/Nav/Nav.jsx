@@ -1,9 +1,17 @@
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import { logout } from "../../../utils/auth";
 import "./__nav.scss";
+import { useState } from "react";
 
-const Nav = () => {
+const Nav = ({ toggleMenu }) => {
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleToggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    toggleMenu(!isMenuOpen);
+  };
 
   const handleLogout = () => {
     logout();
@@ -13,44 +21,32 @@ const Nav = () => {
 
   return (
     <div className="nav">
-      <button>
+      <button onClick={handleToggleMenu}>
         <img
           className="nav_iconCloseShow"
           src=""
           alt="Butoon show/close lateralMenu"
-          // onClick={}
         />
       </button>
 
       <div className="nav__container">
         <button>
-          <img
-            className="nav__container__icon"
-            src=""
-            alt="Messages"
-            // onClick={}
-          />
+          <img className="nav__container__icon" src="" alt="Messages" />
         </button>
         <button>
-          <img
-            className="nav__container__icon"
-            src=""
-            alt="Alerts"
-            // onClick={}
-          />
+          <img className="nav__container__icon" src="" alt="Alerts" />
         </button>
 
-        <button>
-          <img
-            className="nav__container__icon"
-            src=""
-            alt="Logout"
-            onClick={handleLogout}
-          />
+        <button onClick={handleLogout}>
+          <img className="nav__container__icon" src="" alt="Logout" />
         </button>
       </div>
     </div>
   );
+};
+
+Nav.propTypes = {
+  toggleMenu: PropTypes.func.isRequired,
 };
 
 export default Nav;

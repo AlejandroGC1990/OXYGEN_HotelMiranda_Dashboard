@@ -1,14 +1,15 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
-import { login } from "../../../utils/auth";
+import { login } from "../../utils/auth";
 import "./__login.scss";
+import { useNavigate } from "react-router-dom";
 
-const Login = ({ onClose }) => {
+const Login = () => {
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
   });
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -17,7 +18,7 @@ const Login = ({ onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (login(credentials)) {
-      onClose();
+      navigate("/"); 
     } else {
       setError("Usuario o contraseña incorrectos");
     }
@@ -60,10 +61,6 @@ const Login = ({ onClose }) => {
       </div>
     </div>
   );
-};
-
-Login.propTypes = {
-  onClose: PropTypes.func.isRequired,
 };
 
 export default Login;
