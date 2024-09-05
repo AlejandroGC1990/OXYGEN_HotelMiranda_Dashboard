@@ -3,9 +3,9 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Bookings from "./pages/Booking/Bookings";
-import Rooms from "./pages/Rooms";
+import Rooms from "./pages/Rooms/Rooms";
 import Guest from "./pages/Guest";
-import Concierge from "./pages/Concierge";
+import Concierge from "./pages/Concierge/Concierge";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Layout from "./pages/components/Layout/Layout";
 

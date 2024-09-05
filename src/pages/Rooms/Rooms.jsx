@@ -1,15 +1,15 @@
 import { useState } from "react";
 import TableComponent from "../components/Table/Table";
 
-const Bookings = () => {
-  const [currentPage, setCurrentPage] = useState("booking");
+const Rooms = () => {
+  const [currentPage, setCurrentPage] = useState("room");
   return (
     <div>
-      <h1>Bookings</h1>
+      <h1>Room</h1>
 
       <TableComponent currentPage={currentPage} />
     </div>
   );
 };
 
-export default Bookings;
+export default Rooms;

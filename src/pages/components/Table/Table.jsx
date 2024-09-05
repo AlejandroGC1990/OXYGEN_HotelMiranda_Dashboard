@@ -1,110 +1,12 @@
-import "./__table.scss";
+import { useState, useMemo } from "react";
 import data from "../../../data/falseData_contact.json";
 import styled from "styled-components";
-import { useState } from "react";
-
-// // const Table = styled.table`
-// //   width: 100%;
-// // `;
-
-// const TableComponent = () => {
-
-//   return (
-//     <div className="table">
-//       <div className="table__containerSelectors">
-//         <div className="table__containerSelectors__selector">
-//           <p>All Contact</p>
-//         </div>
-//         <div className="table__containerSelectors__selector">
-//           <p>Archived</p>
-//         </div>
-//       </div>
-
-//       <table className="table__containerTable">
-//         <thead className="table__containerTable__header">
-//           <tr>
-//             <th>
-//               <strong>Order Id</strong>
-//             </th>
-//             <th>
-//               <strong>Date</strong>
-//             </th>
-//             <th>
-//               <strong>Customer</strong>
-//             </th>
-//             <th>
-//               <strong>Comment</strong>
-//             </th>
-//             <th>
-//               <strong>Action</strong>
-//             </th>
-//           </tr>
-//         </thead>
-
-//         <tbody className="table__containerTable__content">
-//           {data.map((data) => {
-//             return (
-//               <tr key={data.id_review}>
-//                 <td>#{data.id_review}</td>
-//                 <td>{data.date}</td>
-//                 <td>
-//                   <div>
-//                     {data.name}
-//                     <br/>
-//                     {data.email}
-//                     <br/>
-//                     {data.phone}
-//                   </div>
-//                 </td>
-//                 <td>
-//                   <div>
-//                     {data.pounts}
-//                     <br/>
-//                     {/* {data.comment} */}
-//                     patata patata patata patata patata patata patata patata patata patata patata patata patata patata patata
-//                   </div>
-//                 </td>
-//                 <td className="table__containerTable__content__register__actions">
-//                   <td>Publish</td>
-//                   <td>Archive</td>
-//                 </td>
-//               </tr>
-//             );
-//           })}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// };
-
-// export default TableComponent;
+import PropTypes from "prop-types";
+import "./__table.scss";
 
 const TableWrapper = styled.div`
   width: 100%;
   padding: 20px;
-`;
-
-const SelectorContainer = styled.div`
-  display: flex;
-  margin-bottom: 20px;
-`;
-
-const Selector = styled.div`
-  margin-right: 20px;
-  cursor: pointer;
-  padding: 10px;
-  background-color: ${({ active }) => (active ? "#007bff" : "#f0f0f0")};
-  color: ${({ active }) => (active ? "white" : "#555")};
-  border-radius: 5px;
-
-  p {
-    font-weight: bold;
-  }
-
-  &:hover {
-    background-color: #0056b3;
-    color: white;
-  }
 `;
 
 const StyledTable = styled.table`
@@ -129,102 +31,226 @@ const TableBody = styled.tbody`
   }
 `;
 
-const CustomerInfo = styled.div`
+const Pagination = styled.div`
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  margin-top: 20px;
 
-  span {
-    margin: 2px 0;
-  }
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 10px;
   button {
+    margin: 0 5px;
     padding: 5px 10px;
-    border: none;
     background-color: #007bff;
     color: white;
+    border: none;
     cursor: pointer;
     border-radius: 3px;
 
-    &:hover {
+    &:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
       background-color: #0056b3;
     }
   }
 `;
 
-const ReviewText = styled.div`
-  max-width: 150px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
+const ITEMS_PER_PAGE = 10;
 
-const TableComponent = () => {
-  const [showArchived, setShowArchived] = useState(false);
+const TableComponent = ({ currentPage }) => {
+  const [currentPageIndex, setCurrentPageIndex] = useState(1);
 
-  const filteredData = showArchived
-    ? data.filter((item) => item.review_archive === true)
-    : data;
+  const filteredData = useMemo(() => {
+    return data;
+  }, []);
 
-  const sortedData = filteredData.sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
-  );
+  const sortedData = useMemo(() => {
+    return filteredData.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }, [filteredData]);
+
+  const totalPages = Math.ceil(sortedData.length / ITEMS_PER_PAGE);
+
+  const paginatedData = useMemo(() => {
+    const start = (currentPageIndex - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    return sortedData.slice(start, end);
+  }, [currentPageIndex, sortedData]);
+
+  const columnsForDashboard = [
+    "Order Id",
+    "Date",
+    "Customer",
+    "Comment",
+    "Action",
+  ];
+  const columnsForBooking = [
+    "Guest",
+    "Order Date",
+    "Check In",
+    "Check Out",
+    "Special Request",
+    "Room Type",
+    "Status",
+  ];
+  const columnsForRoom = [
+    "Room Name",
+    "Bed Type",
+    "Room Floor",
+    "Amenities ",
+    "Price",
+    "Status",
+    "Offer Price",
+  ];
+  const columnsForConcierge = [
+    "Name",
+    "Job Desk",
+    "Schedule",
+    "Contact",
+    "Status",
+  ];
+
+  const renderCellContent = (item, key) => {
+    switch (currentPage) {
+      case "dashboard":
+        if (key === "Order Id") {
+          return <span>{item.id_review}</span>;
+        } else if (key === "Customer") {
+          return (
+            <div>
+              <span>{item.name}</span>
+              <span>{item.email}</span>
+              <span>{item.phone}</span>
+            </div>
+          );
+        } else if (key === "Comment") {
+          return (
+            <div>
+              {item.pounts}
+              <br />
+              {item.comment}
+            </div>
+          );
+        } else if (key === "Action") {
+          return <button>Archive</button>;
+        } else {
+          return item[key.toLowerCase().replace(/ /g, "_")];
+        }
+      case "booking":
+        if (key === "Guest") {
+          return (
+            <div>
+              <span>{item.name}</span>
+              <span>{item.booking_id}</span>
+            </div>
+          );
+        } else if (key === "Special Request") {
+          return <button>Open Request</button>;
+        } else if (key === "Status") {
+          const statusColors = {
+            "Check In": "green",
+            "Check Out": "red",
+            "In Progress": "yellow",
+          };
+          return (
+            <span
+              style={{ color: statusColors[item.statusBooking] || "black" }}
+            >
+              {item.statusBooking}
+            </span>
+          );
+        } else {
+          return item[key.toLowerCase().replace(/ /g, "_")];
+        }
+      case "room":
+        if (key === "Room Name") {
+          return (
+            <div>
+              <img src={item.room_photo} alt={item.room_number} />
+              <span>{item.room_number}</span>
+            </div>
+          );
+        } else if (key === "Offer Price") {
+          const discount = item.price * 0.8; // 20% de descuento por ejemplo
+          return `$${discount.toFixed(2)}`;
+        } else if (key === "Status") {
+          return item.room_status === "Available" ? "Available" : "Booked";
+        } else {
+          return item[key.toLowerCase().replace(/ /g, "_")];
+        }
+      case "concierge":
+        return item[key.toLowerCase().replace(/ /g, "_")];
+      default:
+        return null;
+    }
+  };
+
+  const columns =
+    currentPage === "dashboard"
+      ? columnsForDashboard
+      : currentPage === "booking"
+      ? columnsForBooking
+      : currentPage === "room"
+      ? columnsForRoom
+      : currentPage === "concierge"
+      ? columnsForConcierge
+      : [];
+
+  const handleNextPage = () => {
+    if (currentPageIndex < totalPages) {
+      setCurrentPageIndex(currentPageIndex + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPageIndex > 1) {
+      setCurrentPageIndex(currentPageIndex - 1);
+    }
+  };
 
   return (
     <TableWrapper>
-      <SelectorContainer>
-        <Selector active={!showArchived} onClick={() => setShowArchived(false)}>
-          <p>All Contact</p>
-        </Selector>
-        <Selector active={showArchived} onClick={() => setShowArchived(true)}>
-          <p>Archived</p>
-        </Selector>
-      </SelectorContainer>
-
-      {/* Tabla */}
       <StyledTable>
         <TableHeader>
           <tr>
-            <th>Order Id</th>
-            <th>Date</th>
-            <th>Customer</th>
-            <th>Comment</th>
-            <th>Action</th>
+            {columns.map((col, index) => (
+              <th key={index}>{col}</th>
+            ))}
           </tr>
         </TableHeader>
 
         <TableBody>
-          {sortedData.map((item) => (
-            <tr key={item.id_review}>
-              <td>#{item.id_review}</td>
-              <td>{item.date}</td>
-              <td>
-                <CustomerInfo>
-                  <span>{item.name}</span>
-                  <span>{item.email}</span>
-                  <span>{item.phone}</span>
-                </CustomerInfo>
-              </td>
-              <td>
-                <ReviewText>
-                  {item.pounts} - patata patata patata patata patata patata
-                  patata...
-                </ReviewText>
-              </td>
-              <td>
-                <ActionButtons>
-                  <button>Archive</button>
-                </ActionButtons>
-              </td>
+          {paginatedData.map((item, index) => (
+            <tr key={index}>
+              {columns.map((col) => (
+                <td key={col}>{renderCellContent(item, col)}</td>
+              ))}
             </tr>
           ))}
         </TableBody>
       </StyledTable>
+
+      {/* Pagination Controls */}
+      <Pagination>
+        <button onClick={handlePreviousPage} disabled={currentPageIndex === 1}>
+          Previous
+        </button>
+        <span>
+          Page {currentPageIndex} of {totalPages}
+        </span>
+        <button
+          onClick={handleNextPage}
+          disabled={currentPageIndex === totalPages}
+        >
+          Next
+        </button>
+      </Pagination>
     </TableWrapper>
   );
+};
+
+TableComponent.propTypes = {
+  currentPage: PropTypes.string.isRequired,
 };
 
 export default TableComponent;
