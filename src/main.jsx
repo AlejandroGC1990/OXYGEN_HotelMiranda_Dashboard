@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Bookings from "./pages/Booking/Bookings";
 import Rooms from "./pages/Rooms/Rooms";
-import Guest from "./pages/Guest";
+import Contact from "./pages/Contact/Contact";
 import Concierge from "./pages/Concierge/Concierge";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Layout from "./pages/components/Layout/Layout";
@@ -34,11 +34,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path=":id/edit" element={<Rooms />} />
             <Route path=":id/delete" element={<Rooms />} />
           </Route>
-          <Route path="guest" element={<Guest />}>
-            <Route path=":id" element={<Guest />} />
-            <Route path="new" element={<Guest />} />
-            <Route path=":id/edit" element={<Guest />} />
-            <Route path=":id/delete" element={<Guest />} />
+          <Route path="contact" element={<Contact />}>
+            <Route path=":id" element={<Contact />} />
+            <Route path="new" element={<Contact />} />
+            <Route path=":id/edit" element={<Contact />} />
+            <Route path=":id/delete" element={<Contact />} />
           </Route>
         </Route>
       </Routes>

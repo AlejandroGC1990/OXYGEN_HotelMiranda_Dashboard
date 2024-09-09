@@ -59,24 +59,27 @@ const Pagination = styled.div`
 const ITEMS_PER_PAGE = 10;
 
 const TableComponent = ({ currentPage }) => {
+  //? Estado que almacena el íncide de la página actual de la tabla.
   const [currentPageIndex, setCurrentPageIndex] = useState(1);
 
-  const filteredData = useMemo(() => {
-    return data;
-  }, []);
-
+  const filteredData = useMemo(() => data, []);
+  //? Ordena los datos por fecha descendiente
   const sortedData = useMemo(() => {
     return filteredData.sort((a, b) => new Date(b.date) - new Date(a.date));
   }, [filteredData]);
 
+  //?  Calcula el número total de páginas dividiendo la longitud de los datos por ITEMS_PER_PAGE
   const totalPages = Math.ceil(sortedData.length / ITEMS_PER_PAGE);
 
+  //?  selecciona los datos para mostrar en la página actual con slice
+  //?(paginar es tomar un subconjunto de los datos totales).
   const paginatedData = useMemo(() => {
     const start = (currentPageIndex - 1) * ITEMS_PER_PAGE;
     const end = start + ITEMS_PER_PAGE;
     return sortedData.slice(start, end);
   }, [currentPageIndex, sortedData]);
 
+  //? Columnas de la tabla para cada una de las páginas:
   const columnsForDashboard = [
     "Order Id",
     "Date",
@@ -85,7 +88,7 @@ const TableComponent = ({ currentPage }) => {
     "Action",
   ];
   const columnsForBooking = [
-    "Guest",
+    "Contact",
     "Order Date",
     "Check In",
     "Check Out",
@@ -110,6 +113,22 @@ const TableComponent = ({ currentPage }) => {
     "Status",
   ];
 
+  //? Selecciona las columnas correctas según la página (currentPage) que se esté mostrando.
+  const columns =
+    currentPage === "dashboard"
+      ? columnsForDashboard
+      : currentPage === "booking"
+      ? columnsForBooking
+      : currentPage === "room"
+      ? columnsForRoom
+      : currentPage === "concierge"
+      ? columnsForConcierge
+      : [];
+
+  const toCamelCase = (str) => str.toLowerCase().replace(/ /g, "_");
+
+  //? Define cómo se debe renderizar el contenido de cada celda dependiendo
+  //? de la página actual y el tipo de columna.
   const renderCellContent = (item, key) => {
     switch (currentPage) {
       case "dashboard":
@@ -134,10 +153,10 @@ const TableComponent = ({ currentPage }) => {
         } else if (key === "Action") {
           return <button>Archive</button>;
         } else {
-          return item[key.toLowerCase().replace(/ /g, "_")];
+          return item[toCamelCase(key)];
         }
       case "booking":
-        if (key === "Guest") {
+        if (key === "Contact") {
           return (
             <div>
               <span>{item.name}</span>
@@ -160,13 +179,13 @@ const TableComponent = ({ currentPage }) => {
             </span>
           );
         } else {
-          return item[key.toLowerCase().replace(/ /g, "_")];
+          return item[toCamelCase(key)];
         }
       case "room":
         if (key === "Room Name") {
           return (
             <div>
-              <img src={item.room_photo} alt={item.room_number} />
+              <img src={item.room_photo} alt={`Room ${item.room_number}`} />
               <span>{item.room_number}</span>
             </div>
           );
@@ -176,32 +195,22 @@ const TableComponent = ({ currentPage }) => {
         } else if (key === "Status") {
           return item.room_status === "Available" ? "Available" : "Booked";
         } else {
-          return item[key.toLowerCase().replace(/ /g, "_")];
+          return item[toCamelCase(key)];
         }
       case "concierge":
-        return item[key.toLowerCase().replace(/ /g, "_")];
+        return item[toCamelCase(key)];
       default:
         return null;
     }
   };
 
-  const columns =
-    currentPage === "dashboard"
-      ? columnsForDashboard
-      : currentPage === "booking"
-      ? columnsForBooking
-      : currentPage === "room"
-      ? columnsForRoom
-      : currentPage === "concierge"
-      ? columnsForConcierge
-      : [];
-
+  //? handleNextPage y handlePreviousPage controlan la paginación,
+  //? cambiando de página al hacer clic en "Next" o "Previous".
   const handleNextPage = () => {
     if (currentPageIndex < totalPages) {
       setCurrentPageIndex(currentPageIndex + 1);
     }
   };
-
   const handlePreviousPage = () => {
     if (currentPageIndex > 1) {
       setCurrentPageIndex(currentPageIndex - 1);
@@ -230,7 +239,6 @@ const TableComponent = ({ currentPage }) => {
         </TableBody>
       </StyledTable>
 
-      {/* Pagination Controls */}
       <Pagination>
         <button onClick={handlePreviousPage} disabled={currentPageIndex === 1}>
           Previous
