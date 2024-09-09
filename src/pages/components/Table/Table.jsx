@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import data from "../../../data/falseData_contact.json";
 import styled from "styled-components";
 import PropTypes from "prop-types";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./__table.scss";
 
 const TableWrapper = styled.div`
@@ -74,6 +75,7 @@ const TableComponent = ({ currentPage }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(1); //?Almacena el íncide de la página actual de la tabla.
   const [filter, setFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  const [paginatedData, setPaginatedData] = useState([]); //? Agregar estado para paginatedData (drag and drop)
 
   //?
   const filteredData = useMemo(() => {
@@ -122,20 +124,30 @@ const TableComponent = ({ currentPage }) => {
     return filtered;
   }, [filter, searchTerm, currentPage]);
 
-  //? Ordena los datos por fecha descendiente
+  //? Ordena por defecto los datos en cada página
   const sortedData = useMemo(() => {
-    return filteredData.sort((a, b) => new Date(b.date) - new Date(a.date));
-  }, [filteredData]);
+    let sorted = filteredData;
+
+    if (currentPage === "room") {
+      //? Ordena por número de habitación por defecto
+      sorted = [...filteredData].sort((a, b) => a.room_number - b.room_number);
+    } else {
+      //? Ordena por Date
+      sorted = filteredData.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    return sorted;
+  }, [filteredData, currentPage]);
 
   //?  Calcula el número total de páginas dividiendo la longitud de los datos por ITEMS_PER_PAGE
   const totalPages = Math.ceil(sortedData.length / ITEMS_PER_PAGE);
 
   //?  selecciona los datos para mostrar en la página actual con slice
   //?(paginar es tomar un subconjunto de los datos totales).
-  const paginatedData = useMemo(() => {
+  useMemo(() => {
     const start = (currentPageIndex - 1) * ITEMS_PER_PAGE;
     const end = start + ITEMS_PER_PAGE;
-    return sortedData.slice(start, end);
+    setPaginatedData(sortedData.slice(start, end));
   }, [currentPageIndex, sortedData]);
 
   const handleFilterChange = (newFilter) => {
@@ -345,28 +357,62 @@ const TableComponent = ({ currentPage }) => {
     }
   };
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const reorderedItems = Array.from(paginatedData);
+    const [movedItem] = reorderedItems.splice(result.source.index, 1);
+    reorderedItems.splice(result.destination.index, 0, movedItem);
+
+    //? Actualizar el estado con el nuevo orden
+    setPaginatedData(reorderedItems);
+  };
+
   return (
     <TableWrapper>
       {renderSelectors()}
-      <StyledTable>
-        <TableHeader>
-          <tr>
-            {columns.map((col, index) => (
-              <th key={index}>{col}</th>
-            ))}
-          </tr>
-        </TableHeader>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="droppable">
+          {(provided) => (
+            <StyledTable ref={provided.innerRef} {...provided.droppableProps}>
+              <TableHeader>
+                <tr>
+                  {columns.map((col, index) => (
+                    <th key={index}>{col}</th>
+                  ))}
+                </tr>
+              </TableHeader>
 
-        <TableBody>
-          {paginatedData.map((item, index) => (
-            <tr key={index}>
-              {columns.map((col) => (
-                <td key={col}>{renderCellContent(item, col)}</td>
-              ))}
-            </tr>
-          ))}
-        </TableBody>
-      </StyledTable>
+              <TableBody>
+                {paginatedData.map((item, index) => (
+                  <Draggable
+                    key={item.id ? item.id.toString() : `fallback-${index}`}
+                    draggableId={
+                      item.id ? item.id.toString() : `fallback-${index}`
+                    }
+                    index={index}
+                  >
+                    {(provided) => (
+                      <tr
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        {columns.map((col) => (
+                          <td key={col}>{renderCellContent(item, col)}</td>
+                        ))}
+                      </tr>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </TableBody>
+            </StyledTable>
+          )}
+        </Droppable>
+      </DragDropContext>
 
       <Pagination>
         <button onClick={handlePreviousPage} disabled={currentPageIndex === 1}>
