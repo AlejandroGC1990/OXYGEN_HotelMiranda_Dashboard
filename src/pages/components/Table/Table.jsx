@@ -56,13 +56,72 @@ const Pagination = styled.div`
   }
 `;
 
+const SelectorWrapper = styled.div`
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+`;
+
+const SearchInput = styled.input`
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+`;
 const ITEMS_PER_PAGE = 10;
 
 const TableComponent = ({ currentPage }) => {
-  //? Estado que almacena el íncide de la página actual de la tabla.
-  const [currentPageIndex, setCurrentPageIndex] = useState(1);
+  const [currentPageIndex, setCurrentPageIndex] = useState(1); //?Almacena el íncide de la página actual de la tabla.
+  const [filter, setFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredData = useMemo(() => data, []);
+  //?
+  const filteredData = useMemo(() => {
+    let filtered = data;
+
+    if (currentPage === "contact") {
+      if (filter === "Published") {
+        filtered = data.filter((item) => item.status === "published");
+      } else if (filter === "Archived") {
+        filtered = data.filter((item) => item.status === "archived");
+      }
+    } else if (currentPage === "room") {
+      if (filter === "Available Rooms") {
+        filtered = data.filter((item) => item.room_status === "available");
+      } else if (filter === "Occupied Rooms") {
+        filtered = data.filter((item) => item.room_status !== "available");
+      } else if (filter === "Price") {
+        filtered = [...data].sort((a, b) => a.price - b.price);
+      }
+    } else if (currentPage === "booking") {
+      if (filter === "Check In") {
+        filtered = [...data].sort(
+          (a, b) => new Date(b.check_in) - new Date(a.check_in)
+        );
+      } else if (filter === "Check Out") {
+        filtered = [...data].sort(
+          (a, b) => new Date(b.check_out) - new Date(a.check_out)
+        );
+      } else if (filter === "In Progress") {
+        filtered = data.filter((item) => item.statusBooking === "In Progress");
+      }
+    } else if (currentPage === "users") {
+      if (filter === "Active Employee") {
+        filtered = data.filter((item) => item.status === "active");
+      } else if (filter === "Inactive Employee") {
+        filtered = data.filter((item) => item.status === "inactive");
+      }
+
+      if (searchTerm) {
+        filtered = filtered.filter((item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+    }
+
+    return filtered;
+  }, [filter, searchTerm, currentPage]);
+
   //? Ordena los datos por fecha descendiente
   const sortedData = useMemo(() => {
     return filteredData.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -79,8 +138,13 @@ const TableComponent = ({ currentPage }) => {
     return sortedData.slice(start, end);
   }, [currentPageIndex, sortedData]);
 
+  const handleFilterChange = (newFilter) => {
+    setFilter(newFilter);
+    setCurrentPageIndex(1); //Resetea la paginación cuando filtra los cambios
+  };
+
   //? Columnas de la tabla para cada una de las páginas:
-  const columnsForDashboard = [
+  const columnsForContact = [
     "Order Id",
     "Date",
     "Customer",
@@ -105,24 +169,18 @@ const TableComponent = ({ currentPage }) => {
     "Status",
     "Offer Price",
   ];
-  const columnsForConcierge = [
-    "Name",
-    "Job Desk",
-    "Schedule",
-    "Contact",
-    "Status",
-  ];
+  const columnsForUsers = ["Name", "Job Desk", "Schedule", "Contact", "Status"];
 
   //? Selecciona las columnas correctas según la página (currentPage) que se esté mostrando.
   const columns =
-    currentPage === "dashboard"
-      ? columnsForDashboard
+    currentPage === "contact"
+      ? columnsForContact
       : currentPage === "booking"
       ? columnsForBooking
       : currentPage === "room"
       ? columnsForRoom
-      : currentPage === "concierge"
-      ? columnsForConcierge
+      : currentPage === "users"
+      ? columnsForUsers
       : [];
 
   const toCamelCase = (str) => str.toLowerCase().replace(/ /g, "_");
@@ -131,7 +189,7 @@ const TableComponent = ({ currentPage }) => {
   //? de la página actual y el tipo de columna.
   const renderCellContent = (item, key) => {
     switch (currentPage) {
-      case "dashboard":
+      case "contact":
         if (key === "Order Id") {
           return <span>{item.id_review}</span>;
         } else if (key === "Customer") {
@@ -197,7 +255,7 @@ const TableComponent = ({ currentPage }) => {
         } else {
           return item[toCamelCase(key)];
         }
-      case "concierge":
+      case "users":
         return item[toCamelCase(key)];
       default:
         return null;
@@ -217,8 +275,79 @@ const TableComponent = ({ currentPage }) => {
     }
   };
 
+  //? Define cómo se deben renderizar los selectores de cada página dependiendo
+  //? de la página actual.
+  const renderSelectors = () => {
+    if (currentPage === "contact") {
+      return (
+        <SelectorWrapper>
+          <button onClick={() => handleFilterChange("All")}>
+            All Customers reviews
+          </button>
+          <button onClick={() => handleFilterChange("Published")}>
+            Published
+          </button>
+          <button onClick={() => handleFilterChange("Archived")}>
+            Archived
+          </button>
+        </SelectorWrapper>
+      );
+    } else if (currentPage === "room") {
+      return (
+        <SelectorWrapper>
+          <button onClick={() => handleFilterChange("All")}>All Rooms</button>
+          <button onClick={() => handleFilterChange("Available Rooms")}>
+            Available Rooms
+          </button>
+          <button onClick={() => handleFilterChange("Occupied Rooms")}>
+            Occupied Rooms
+          </button>
+          <button onClick={() => handleFilterChange("Price")}>Price</button>
+        </SelectorWrapper>
+      );
+    } else if (currentPage === "booking") {
+      return (
+        <SelectorWrapper>
+          <button onClick={() => handleFilterChange("All")}>
+            All Bookings
+          </button>
+          <button onClick={() => handleFilterChange("Check In")}>
+            Check In
+          </button>
+          <button onClick={() => handleFilterChange("Check Out")}>
+            Check Out
+          </button>
+          <button onClick={() => handleFilterChange("In Progress")}>
+            In Progress
+          </button>
+        </SelectorWrapper>
+      );
+    } else if (currentPage === "users") {
+      return (
+        <SelectorWrapper>
+          <button onClick={() => handleFilterChange("All")}>
+            All Employees
+          </button>
+          <button onClick={() => handleFilterChange("Active Employee")}>
+            Active Employee
+          </button>
+          <button onClick={() => handleFilterChange("Inactive Employee")}>
+            Inactive Employee
+          </button>
+          <SearchInput
+            type="text"
+            placeholder="Search by employee name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </SelectorWrapper>
+      );
+    }
+  };
+
   return (
     <TableWrapper>
+      {renderSelectors()}
       <StyledTable>
         <TableHeader>
           <tr>

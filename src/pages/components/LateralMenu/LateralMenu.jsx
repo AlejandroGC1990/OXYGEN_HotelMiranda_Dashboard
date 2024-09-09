@@ -18,8 +18,8 @@ const LateralMenu = ({ isOpen }) => {
         <Link to="/contact" className="lateralMenu__sections__pack">
           <p>Contact</p>
         </Link>
-        <Link to="/concierge" className="lateralMenu__sections__pack">
-          <p>Concierge</p>
+        <Link to="/users" className="lateralMenu__sections__pack">
+          <p>Users</p>
         </Link>
       </div>
       <div className="lateralMenu__containerUser">

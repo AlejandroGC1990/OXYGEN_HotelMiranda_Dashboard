@@ -3,7 +3,7 @@ import TableComponent from "../components/Table/Table";
 import { useState } from "react";
 
 const Contact = () => {
-  const [currentPage, setCurrentPage] = useState("dashboard");
+  const [currentPage, setCurrentPage] = useState("contact");
   const {id} = useParams();
   
   return (

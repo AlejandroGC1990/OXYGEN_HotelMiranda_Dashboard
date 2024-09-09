@@ -5,7 +5,7 @@ import Login from "./pages/Login/Login";
 import Bookings from "./pages/Booking/Bookings";
 import Rooms from "./pages/Rooms/Rooms";
 import Contact from "./pages/Contact/Contact";
-import Concierge from "./pages/Concierge/Concierge";
+import Users from "./pages/Users/Users";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Layout from "./pages/components/Layout/Layout";
 
@@ -22,11 +22,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path=":id/edit" element={<Bookings />} />
             <Route path=":id/delete" element={<Bookings />} />
           </Route>
-          <Route path="concierge" element={<Concierge />}>
-            <Route path=":id" element={<Concierge />} />
-            <Route path="new" element={<Concierge />} />
-            <Route path=":id/edit" element={<Concierge />} />
-            <Route path=":id/delete" element={<Concierge />} />
+          <Route path="users" element={<Users />}>
+            <Route path=":id" element={<Users />} />
+            <Route path="new" element={<Users />} />
+            <Route path=":id/edit" element={<Users />} />
+            <Route path=":id/delete" element={<Users />} />
           </Route>
           <Route path="rooms" element={<Rooms />}>
             <Route path=":id" element={<Rooms />} />
