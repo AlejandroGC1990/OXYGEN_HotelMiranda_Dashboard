@@ -1,8 +1,6 @@
 import { useState } from "react";
-// import { login } from "../../utils/auth";
 import "./__login.scss";
 import { useAuth } from "../../context/AuthContext";
-// import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
