@@ -1,12 +1,11 @@
-import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { logout } from "../../../utils/auth";
 import "./__nav.scss";
 import { useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
 
 const Nav = ({ toggleMenu }) => {
-  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { logout } = useAuth(); //? Usar logout del contexto
 
   const handleToggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -15,8 +14,6 @@ const Nav = ({ toggleMenu }) => {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
-    window.location.reload();
   };
 
   return (

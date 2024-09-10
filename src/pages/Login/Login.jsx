@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { login } from "../../utils/auth";
 import "./__login.scss";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
@@ -9,7 +8,7 @@ const Login = () => {
     password: "",
   });
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const {login, isLogedIn} = useAuth(); //?Obtener login y el estado isLoggedIn del contexto 
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -17,9 +16,7 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (login(credentials)) {
-      navigate("/"); 
-    } else {
+    if (!login(credentials)) {
       setError("Usuario o contraseña incorrectos");
     }
   };
