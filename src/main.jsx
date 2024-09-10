@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
 import Login from "./pages/Login/Login";
 import Bookings from "./pages/Booking/Bookings";
 import Rooms from "./pages/Rooms/Rooms";
@@ -12,6 +13,7 @@ import Layout from "./pages/components/Layout/Layout";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
+    <AuthProvider>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Layout />}>
@@ -42,6 +44,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           </Route>
         </Route>
       </Routes>
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
