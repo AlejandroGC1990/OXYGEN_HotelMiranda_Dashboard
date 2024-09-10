@@ -2,7 +2,6 @@ import { Outlet, useNavigate } from "react-router-dom";
 import LateralMenu from "../LateralMenu/LateralMenu";
 import Nav from "../Nav/Nav";
 import "./__layout.scss";
-import { isAuthenticated } from "../../../utils/auth";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 
