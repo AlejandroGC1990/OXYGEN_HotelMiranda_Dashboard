@@ -4,16 +4,18 @@ import Nav from "../Nav/Nav";
 import "./__layout.scss";
 import { isAuthenticated } from "../../../utils/auth";
 import { useEffect, useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
 
 const Layout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const {isLoggedIn} = useAuth(); //?Usar el estado del contexto
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated()) {
+    if (!isLoggedIn) {
       navigate("/login");
     }
-  }, [navigate]);
+  }, [isLoggedIn, navigate]);
 
   const toggleMenu = (isOpen) => {
     setIsMenuOpen(isOpen);
