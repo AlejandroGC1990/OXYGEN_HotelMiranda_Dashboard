@@ -1,5 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit';
-import bookingReducer from '../features/booking/bookingSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import bookingReducer from "../features/bookings/bookingSlice";
 
 const store = configureStore({
   reducer: {
