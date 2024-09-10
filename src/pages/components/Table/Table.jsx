@@ -1,9 +1,11 @@
 import { useState, useMemo } from "react";
-import data from "../../../data/falseData_contact.json";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./__table.scss";
+import contactData from "../../../data/falseData_contact.json";
+import roomData from "../../../data/falseData_rooms.json";
+import userData from "../../../data/falseData_users.json";
 
 const TableWrapper = styled.div`
   width: 100%;
@@ -77,7 +79,25 @@ const TableComponent = ({ currentPage }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [paginatedData, setPaginatedData] = useState([]); //? Agregar estado para paginatedData (drag and drop)
 
-  //?
+  //? Manejar los datos según la página actual
+  const data = useMemo(() => {
+    if (currentPage === "contact") {
+      return contactData;
+    } else if (currentPage === "room") {
+      return roomData;
+    } else if (currentPage === "users") {
+      return userData;
+    } else if (currentPage === "booking") {
+      //? Combinar datos de usuarios y habitaciones
+      return userData.map((user, index) => ({
+        ...user,
+        room: roomData[index % roomData.length],
+      }));
+    }
+    return [];
+  }, [currentPage]);
+
+  //? Filtrar los datos según la página y filtro
   const filteredData = useMemo(() => {
     let filtered = data;
 
@@ -89,29 +109,39 @@ const TableComponent = ({ currentPage }) => {
       }
     } else if (currentPage === "room") {
       if (filter === "Available Rooms") {
-        filtered = data.filter((item) => item.room_status === "available");
+        filtered = data.filter((item) => item.room_status === "Available");
       } else if (filter === "Occupied Rooms") {
-        filtered = data.filter((item) => item.room_status !== "available");
+        filtered = data.filter((item) => item.room_status !== "Available");
       } else if (filter === "Price") {
-        filtered = [...data].sort((a, b) => a.price - b.price);
+        // filtered = [...data].sort((a, b) => a.price - b.price);
+        filtered = [...data].sort(
+          (a, b) =>
+            parseFloat(a.rate.substring(1)) - parseFloat(b.rate.substring(1))
+        );
       }
     } else if (currentPage === "booking") {
       if (filter === "Check In") {
+        // filtered = [...data].sort(
+        //   (a, b) => new Date(b.check_in) - new Date(a.check_in)
+        // );
         filtered = [...data].sort(
-          (a, b) => new Date(b.check_in) - new Date(a.check_in)
+          (a, b) => new Date(b.room.check_in) - new Date(a.room.check_in)
         );
       } else if (filter === "Check Out") {
+        // filtered = [...data].sort(
+        //   (a, b) => new Date(b.check_out) - new Date(a.check_out)
+        // );
         filtered = [...data].sort(
-          (a, b) => new Date(b.check_out) - new Date(a.check_out)
+          (a, b) => new Date(b.room.check_out) - new Date(a.room.check_out)
         );
       } else if (filter === "In Progress") {
         filtered = data.filter((item) => item.statusBooking === "In Progress");
       }
     } else if (currentPage === "users") {
       if (filter === "Active Employee") {
-        filtered = data.filter((item) => item.status === "active");
+        filtered = data.filter((item) => item.status === "Active");
       } else if (filter === "Inactive Employee") {
-        filtered = data.filter((item) => item.status === "inactive");
+        filtered = data.filter((item) => item.status === "Inactive");
       }
 
       if (searchTerm) {
@@ -122,7 +152,7 @@ const TableComponent = ({ currentPage }) => {
     }
 
     return filtered;
-  }, [filter, searchTerm, currentPage]);
+  }, [filter, searchTerm, currentPage, data]);
 
   //? Ordena por defecto los datos en cada página
   const sortedData = useMemo(() => {
@@ -203,21 +233,23 @@ const TableComponent = ({ currentPage }) => {
     switch (currentPage) {
       case "contact":
         if (key === "Order Id") {
-          return <span>{item.id_review}</span>;
-        } else if (key === "Customer") {
+          return <span>#{item.id_review}</span>;
+        } else if (key === "Date") {
+          return <span>{item.guest_date_review}</span>
+        }else if (key === "Customer") {
           return (
             <div>
-              <span>{item.name}</span>
-              <span>{item.email}</span>
+              <span>{item.guest_name}</span><br/>
+              <span>{item.email}</span><br/>
               <span>{item.phone}</span>
             </div>
           );
         } else if (key === "Comment") {
           return (
             <div>
-              {item.pounts}
+              {item.rate_review}
               <br />
-              {item.comment}
+              {item.comment_review}
             </div>
           );
         } else if (key === "Action") {
