@@ -1,8 +1,8 @@
 import { useState } from "react";
-import TableComponent from "../Concierge/Concierge";
+import TableComponent from "../components/Table/Table";
 
 const Concierge = () => {
-  const [currentPage, setCurrentPage] = useState("concierge");
+  const [currentPage, setCurrentPage] = useState("users");
   return (
     <div>
       <h1>Concierge/Users</h1>

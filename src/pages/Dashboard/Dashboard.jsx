@@ -1,14 +1,11 @@
-// import VisitorBarChart from "../components/BarChart/BarChart";
-// import HotelCalendar from "../components/Calendar/Calendar";
-import { useState } from "react";
-import TableComponent from "../components/Table/Table";
+import VisitorBarChart from "../components/BarChart/BarChart";
+import HotelCalendar from "../components/Calendar/Calendar";
 import "./__dashboard.scss";
 
 const Dashboard = () => {
-  const [currentPage, setCurrentPage] = useState("dashboard");
   return (
     <div className="dashboard">
-      {/* <h1>Dashboard</h1>
+      <h1>Dashboard</h1>
       <div className="dashboard__containerKPIs">
         <div className="dashboard__containerKPIs__pack">
           <div className="dashboard__containerKPIs__pack__img">
@@ -49,12 +46,12 @@ const Dashboard = () => {
             <p>Check out</p>
           </div>
         </div>
-      </div> */}
+      </div>
 
       <div className="dashboard_containerCalendar&ReservStats">
-        {/* <HotelCalendar />
-      <VisitorBarChart /> */}
-        <TableComponent currentPage={currentPage} />
+        <HotelCalendar />
+      <VisitorBarChart />
+        
       </div>
     </div>
   );
