@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import "./__nav.scss";
 import { useState } from "react";
-import LogoutButton from "../../components/LogoutButton";
+import LogoutButton from "../../components/Logout/Logout";
 
 const Nav = ({ toggleMenu }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

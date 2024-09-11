@@ -3,7 +3,7 @@ import LateralMenu from "../LateralMenu/LateralMenu";
 import Nav from "../Nav/Nav";
 import "./__layout.scss";
 import { useEffect, useState } from "react";
-import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../hooks/useAuth";
 
 const Layout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
