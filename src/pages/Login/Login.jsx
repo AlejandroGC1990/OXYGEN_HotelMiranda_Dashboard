@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./__login.scss";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hook/useAuth";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({

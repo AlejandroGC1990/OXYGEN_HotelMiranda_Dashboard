@@ -1,8 +1,4 @@
-import {
-  createContext,
-  useEffect,
-  useReducer,
-} from "react";
+import { createContext, useEffect, useReducer } from "react";
 import {
   login as loginService,
   logout as logoutService,
@@ -42,8 +38,8 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     //? Verificar si el usuario ya está autenticado al cargar la página
-    if(isAuthenticated()){
-      dispatch({type: "LOGIN", payload: localStorage.getItem("user")});
+    if (isAuthenticated()) {
+      dispatch({ type: "LOGIN", payload: localStorage.getItem("user") });
     }
   }, []);
 
