@@ -24,13 +24,20 @@ const Contact = () => {
 
   //?Function para filtrar datos basados en el filtro seleccionado
   const filteredData = useMemo(() => {
+    let filtered = contact;
+    
     // if (filter === "Published") {
     //   return contact.filter((item) => item.status === "published");
     // } else
     if (filter === "Archived") {
       return contact.filter((item) => item.guest_statusReview === "archived");
     }
-    return contact;
+    //? Ordenar por fecha (fecha completa) en orden descendente
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.guest_DateReview);
+      const dateB = new Date(b.guest_DateReview);
+      return dateB - dateA; //? Orden descendente
+    });
   }, [filter, contact]);
 
   //?Función para manejar el cambio de filtro

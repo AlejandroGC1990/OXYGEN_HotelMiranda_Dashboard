@@ -125,7 +125,7 @@ const TableComponent = ({ selectors, columns, data, onFilterChange, currentFilte
 TableComponent.propTypes = {
   selectors: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
-  renderCellContent: PropTypes.array.isRequired,
+  renderCellContent: PropTypes.func.isRequired,
   data: PropTypes.array.isRequired,
   onFilterChange: PropTypes.func.isRequired,
   currentFilter: PropTypes.string.isRequired,
