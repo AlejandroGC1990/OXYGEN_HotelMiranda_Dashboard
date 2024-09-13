@@ -1,19 +1,14 @@
 import PropTypes from "prop-types";
 import "./__nav.scss";
 import { useState } from "react";
-import { useAuth } from "../../../context/AuthContext";
+import LogoutButton from "../../components/Logout/Logout";
 
 const Nav = ({ toggleMenu }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { logout } = useAuth(); //? Usar logout del contexto
 
   const handleToggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
     toggleMenu(!isMenuOpen);
-  };
-
-  const handleLogout = () => {
-    logout();
   };
 
   return (
@@ -34,9 +29,7 @@ const Nav = ({ toggleMenu }) => {
           <img className="nav__container__icon" src="" alt="Alerts" />
         </button>
 
-        <button onClick={handleLogout}>
-          <img className="nav__container__icon" src="" alt="Logout" />
-        </button>
+        <LogoutButton />
       </div>
     </div>
   );
