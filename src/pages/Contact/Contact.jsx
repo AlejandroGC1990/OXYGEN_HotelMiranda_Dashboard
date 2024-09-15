@@ -105,6 +105,8 @@ const Contact = () => {
         currentFilter={filter}
         selectors={selectors}
         renderCellContent={renderCellContent}
+        defaultSortColumn="Date"
+        defaultSortDirection="desc"
       />
     </>
   );
