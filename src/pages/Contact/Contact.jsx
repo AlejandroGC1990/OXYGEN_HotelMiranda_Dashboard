@@ -1,10 +1,21 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import TableComponent from "../components/Table/Table";
-import contactData from "../../data/falseData_contact.json";
+import {
+  getAllThunk,
+  archiveContact,
+} from "../../features/contact/contactThunk";
+import { useDispatch, useSelector } from "react-redux";
+import { selectContacts } from "../../features/contact/contactSlice";
 
 const Contact = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts); //? Obtener contactos desde Redux
   const [filter, setFilter] = useState("All");
-  const [contact, setContacts] = useState(contactData);
+
+  //? Conseguir los contactos al cargar el componente
+  useEffect(() => {
+    dispatch(getAllThunk());
+  }, [dispatch]);
 
   //?Función para gestionar las columnas de la tabla de contacto
   const columns = useMemo(() => {
@@ -15,7 +26,6 @@ const Contact = () => {
   const selectors = useMemo(
     () => [
       { value: "All", label: "All Reviews" },
-      // { value: "Published", label: "Published" },
       { value: "Archived", label: "Archived" },
     ],
     []
@@ -23,34 +33,33 @@ const Contact = () => {
 
   //?Function para filtrar datos basados en el filtro seleccionado
   const filteredData = useMemo(() => {
-    let filtered = contact;
-    
-    // if (filter === "Published") {
-    //   return contact.filter((item) => item.status === "published");
-    // } else
+    if (!Array.isArray(contacts)) return [];
+
+    let data = contacts;
+
+    //? Filtrar por estado de revisión
     if (filter === "Archived") {
-      return contact.filter((item) => item.guest_statusReview === "archived");
+      data = data.filter((item) => item.guest_statusReview === "archived");
     }
-    //? Ordenar por fecha (fecha completa) en orden descendente
-    return filtered.sort((a, b) => {
-      const dateA = new Date(a.guest_DateReview);
-      const dateB = new Date(b.guest_DateReview);
-      return dateB - dateA; //? Orden descendente
-    });
-  }, [filter, contact]);
+
+    // Ordenar por fecha (fecha completa) en orden descendente
+    return data
+      .slice() // Clonar el array para evitar mutaciones
+      .sort((a, b) => new Date(b.guest_DateReview) - new Date(a.guest_DateReview));
+  }, [filter, contacts]);
+
+  const sortedContacts = useMemo(() => {
+    return [...contacts].sort((a, b) => new Date(a.date) - new Date(b.date));
+  }, [contacts]);
 
   //?Función para manejar el cambio de filtro
-  const handleFilterChange = (newFilter) => {
+  const handleFilterChange = useCallback((newFilter) => {
     setFilter(newFilter);
-  };
+  });
 
   //? Función para el manejo del botón Archived
   const handleArchiveClick = (id) => {
-    setContacts((prevContacts) =>
-      prevContacts.map((contact) =>
-        contact.id === id ? { ...contact, status: "archived" } : contact
-      )
-    );
+    dispatch(archiveContact(id));
     setFilter("Archived");
   };
 
