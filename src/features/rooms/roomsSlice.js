@@ -1,35 +1,40 @@
 // slices/roomsSlice.js
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import roomsData from '../../data/falseData_rooms.json'; 
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import roomsData from "../../data/falseData_rooms.json";
+import {
+  changeStatus,
+  pending,
+  promiseStatus,
+  rejected,
+} from "../../utils/promises";
 
 const initialState = {
   rooms: [],
-  status: 'idle',
+  status: promiseStatus.IDLE,
   error: null,
 };
 
 //? Thunk para cargar los datos de Rooms
-export const fetchRooms = createAsyncThunk('rooms/fetchRooms', async () => {
-    await DelayNode(delaytime);
+export const fetchRooms = createAsyncThunk("rooms/fetchRooms", async () => {
+  await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulación de delay
   return roomsData;
 });
 
 const roomsSlice = createSlice({
-  name: 'rooms',
+  name: "rooms",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchRooms.pending, (state) => {
-        state.status = 'loading';
+        pending(state);
       })
       .addCase(fetchRooms.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        changeStatus(state, promiseStatus.FULFILLED);
         state.rooms = action.payload;
       })
       .addCase(fetchRooms.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
+        rejected(state, action);
       });
   },
 });
