@@ -1,6 +1,5 @@
-// slices/roomsSlice.js
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import roomsData from "../../data/falseData_rooms.json";
+import { createSlice } from "@reduxjs/toolkit";
+import { fetchRooms } from "../../features/rooms/roomsThunk";
 import {
   changeStatus,
   pending,
@@ -13,12 +12,6 @@ const initialState = {
   status: promiseStatus.IDLE,
   error: null,
 };
-
-//? Thunk para cargar los datos de Rooms
-export const fetchRooms = createAsyncThunk("rooms/fetchRooms", async () => {
-  await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulación de delay
-  return roomsData;
-});
 
 const roomsSlice = createSlice({
   name: "rooms",

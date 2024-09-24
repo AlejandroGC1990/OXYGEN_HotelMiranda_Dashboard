@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchRooms } from "../../features/rooms/roomsSlice";
+import { fetchRooms } from "../../features/rooms/roomsThunk";
 import { useDispatch, useSelector } from "react-redux";
 import TableComponent from "../components/Table/Table";
 
