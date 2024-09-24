@@ -1,5 +1,4 @@
-// import { useParams } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TableComponent from "../components/Table/Table";
 import contactData from "../../data/falseData_contact.json";
 

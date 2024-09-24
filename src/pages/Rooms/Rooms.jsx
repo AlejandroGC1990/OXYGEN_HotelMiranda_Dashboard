@@ -2,12 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchRooms } from "../../features/rooms/roomsSlice";
 import { useDispatch, useSelector } from "react-redux";
 import TableComponent from "../components/Table/Table";
-import roomData from "../../data/falseData_rooms.json";
 
 const Rooms = () => {
   const dispatch = useDispatch();
 
-  // Obtenemos los datos y el estado del slice de rooms
+  //? Obtenemos los datos y el estado del slice de rooms
   const rooms = useSelector((state) => state.rooms.rooms);
   const status = useSelector((state) => state.rooms.status);
   const error = useSelector((state) => state.rooms.error);

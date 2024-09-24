@@ -10,6 +10,7 @@ const initialState = {
 
 //? Thunk para cargar los datos de Rooms
 export const fetchRooms = createAsyncThunk('rooms/fetchRooms', async () => {
+    await DelayNode(delaytime);
   return roomsData;
 });
 
