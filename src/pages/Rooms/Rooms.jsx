@@ -1,9 +1,25 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { fetchRooms } from "../../features/rooms/roomsSlice";
+import { useDispatch, useSelector } from "react-redux";
 import TableComponent from "../components/Table/Table";
 import roomData from "../../data/falseData_rooms.json";
 
 const Rooms = () => {
+  const dispatch = useDispatch();
+
+  // Obtenemos los datos y el estado del slice de rooms
+  const rooms = useSelector((state) => state.rooms.rooms);
+  const status = useSelector((state) => state.rooms.status);
+  const error = useSelector((state) => state.rooms.error);
+
   const [currentFilter, setCurrentFilter] = useState("Available");
+
+  //? Dispatch para cargar los datos al montar el componente
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchRooms());
+    }
+  }, [dispatch, status]);
 
   //?Función para gestionar las columnas de la tabla de rooms
   const columns = useMemo(() => {
@@ -24,7 +40,10 @@ const Rooms = () => {
   ];
 
   //? Filtrar datos basados en el filtro actual
-  const filteredData = roomData.filter((room) => room.room_status === currentFilter);
+  // const filteredData = roomData.filter((room) => room.room_status === currentFilter);
+  const filteredData = useMemo(() => {
+    return rooms.filter((room) => room.room_status === currentFilter);
+  }, [rooms, currentFilter]);
 
   //? Renderizar el contenido de las celdas
   const renderCellContent = (item, column) => {
@@ -46,7 +65,7 @@ const Rooms = () => {
       case "Room Type":
         return <span>{item.room_type}</span>;
       case "Amenities":
-        return <span>{item.room_amenities}</span>;
+        return <span>{item.room_facilities}</span>;
       case "Price":
         return <span>${item.room_price}</span>;
       case "Offer Price": {
@@ -55,8 +74,18 @@ const Rooms = () => {
       }
       case "Status":
         return <span>{item.room_status}</span>;
+      default:
+        return null;
     }
   };
+
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (status === "failed") {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div>
