@@ -26,9 +26,9 @@ const Rooms = () => {
   ];
 
   //? Filtrar datos basados en el filtro actual
-  const handleStatusFilter = (status) => {
-    dispatch(filterRoomsByStatus(status));
-  };
+  // const handleStatusFilter = (status) => {
+  //   dispatch(filterRoomsByStatus(status));
+  // };
 
   //?Constante para declarar las columnas de la tabla de rooms
   const columns = [

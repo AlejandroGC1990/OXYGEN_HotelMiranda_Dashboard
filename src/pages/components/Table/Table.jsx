@@ -2,21 +2,24 @@ import React, { useState } from "react";
 import styled from "styled-components";
 
 const TableWrapper = styled.div`
-  width: auto;
+  width: 100%;
+  overflow-x: auto;
   margin-bottom: 20px;
 
   table {
-    width: auto;
+    width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
   }
 
   th,
   td {
+    max-width: 200px;
+    overflow-wrap: break-word;
+    white-space: normal;
     padding: 0.75rem 1rem;
     text-align: left;
     border-bottom: 1px solid #ddd;
-    white-space: nowrap;
   }
 
   th {
@@ -125,6 +128,15 @@ const Tabla = ({ cols, data, renderCellContent }) => {
     }
 
     return pageNumbers;
+    // return pageNumbers.map((number, index) => (
+    //   <button
+    //     key={index}
+    //     onClick={() => paginate(number)}
+    //     disabled={number === currentPage}
+    //   >
+    //     {number}
+    //   </button>
+    // ));
   };
 
   return (

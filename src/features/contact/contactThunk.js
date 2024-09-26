@@ -7,7 +7,7 @@ const delayTime = 1500;
 let contacts = [...data];
 
 //? Función para obtener los contactos
-export const getAllThunk = createAsyncThunk("contact/getAll", async () => {
+export const fetchContacts = createAsyncThunk("contact/getAll", async () => {
   await delay(delayTime);
   return [...contacts];
 });
@@ -20,17 +20,15 @@ export const archiveContact = createAsyncThunk(
 
     //? Encuentra el contacto por ID y cambia su estado a 'archived'
     const index = contacts.findIndex(
-      (contact) => contact.map((contact) => {
-        if(contact.guest_idReview === 1) {
-          return {
-            ...contact,
-            guest_statusReview: "archived" //? Cambia el estado a archived
-          };
-        }
-        return contact; // Retorna el contacto sin cambios
-  }));
+      (contact) => contact.guest_idReview === id
+    );
+    if (index !== -1) {
+      contacts[index] = {
+        ...contacts[index],
+        guest_statusReview: "archived", //? Cambia el estado a archived
+      };
+    }
 
-    contacts = updatedContacts;  // Actualiza la lista de contactos
-    return updatedContacts; // Devuelve la lista actualizada de contactos
+    return [...contacts]; //? Devuelve la lista actualizada de contactos
   }
 );

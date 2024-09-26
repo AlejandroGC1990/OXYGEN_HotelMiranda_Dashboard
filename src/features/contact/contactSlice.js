@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllThunk } from "./contactThunk";
+import { fetchContacts, archiveContact } from "./contactThunk";
 import {
   changeStatus,
   pending,
@@ -9,7 +9,7 @@ import {
 
 const initialState = {
   contacts: [],
-  contact: null,
+  filteredContacts: [], 
   status: promiseStatus.IDLE,
   error: null,
 };
@@ -18,31 +18,31 @@ const contactSlice = createSlice({
   name: "contact",
   initialState,
   reducers: {
-    archiveContact: (state, action) => {
-      const id = action.payload;
-      state.contacts = state.contacts.map((contact) =>
-        contact.id === id
-          ? { ...contact, guest_statusReview: "archived" }
-          : contact
+    filterContactsByStatus: (state, action) => {
+      const status = action.payload;
+      state.filteredContacts = state.contacts.filter((contact) =>
+        contact.status === status || status === "All"
       );
     },
   },
   extraReducers: (builder) => {
     builder
-      //? Obtener todos los contactos
-      .addCase(getAllThunk.pending, (state) => {
+      .addCase(fetchContacts.pending, (state) => {
         pending(state);
       })
-      .addCase(getAllThunk.fulfilled, (state, action) => {
+      .addCase(fetchContacts.fulfilled, (state, action) => {
         changeStatus(state, promiseStatus.FULFILLED);
         state.contacts = action.payload;
+        state.filteredContacts = action.payload;
       })
-      .addCase(getAllThunk.rejected, (state, action) => {
+      .addCase(fetchContacts.rejected, (state, action) => {
         rejected(state, action);
+      })
+      .addCase(archiveContact.fulfilled, (state, action) => {
+        state.contacts = action.payload; //? Actualiza la lista de contactos
       });
   },
 });
 
-export const { archiveContact } = contactSlice.actions;
-export const selectContacts = (state) => state.contact.contacts; //?selector para obtener los contactos
+export const { filteredContacts, filterContactsByStatus  } = contactSlice.actions;
 export default contactSlice.reducer;

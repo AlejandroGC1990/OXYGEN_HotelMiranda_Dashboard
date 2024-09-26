@@ -1,61 +1,62 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
-import TableComponent from "../components/Table/Table";
-import {
-  getAllThunk,
-  archiveContact,
-} from "../../features/contact/contactThunk";
+import { useEffect, useState } from "react";
+import { fetchContacts } from "../../features/contact/contactThunk";
 import { useDispatch, useSelector } from "react-redux";
-import { selectContacts } from "../../features/contact/contactSlice";
+import TableComponent from "../components/Table/Table";
 
 const Contact = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(selectContacts); //? Obtener contactos desde Redux
-  const [filter, setFilter] = useState("All");
+  //? Obtenemos los datos y el estado del slice de contacts
+  const contacts = useSelector((state) => state.contact.contacts || []);
+  const status = useSelector((state) => state.contact.status);
+  const error = useSelector((state) => state.contact.error);
+
+  // const [filter, setFilter] = useState("All"); //? Añadido estado para el filtro
 
   //? Conseguir los contactos al cargar el componente
   useEffect(() => {
-    dispatch(getAllThunk());
-  }, [dispatch]);
-
-  //?Función para gestionar las columnas de la tabla de contacto
-  const columns = useMemo(() => {
-    return ["Order Id", "Date", "Customer", "Comment", "Action"];
-  }, []);
+    if (status === "idle") {
+      dispatch(fetchContacts());
+    }
+  }, [dispatch, status]);
 
   //? Filtros para la página de Contact
-  const selectors = useMemo(
-    () => [
-      { value: "All", label: "All Reviews" },
-      { value: "Archived", label: "Archived" },
-    ],
-    []
-  );
+  // const selectors = [
+  //   { value: "All", label: "All Reviews" },
+  //   { value: "Archived", label: "Archived" },
+  // ];
+
+  //?Función para gestionar las columnas de la tabla de contacto
+  const columns = [
+    { header: "Order Id", accessor: "order_id" },
+    { header: "Date", accessor: "date" },
+    { header: "Customer", accessor: "customer" },
+    { header: "Comment", accessor: "comment" },
+    { header: "Action", accessor: "action" },
+  ];
 
   //?Function para filtrar datos basados en el filtro seleccionado
-  const filteredData = useMemo(() => {
-    if (!Array.isArray(contacts)) return [];
+  // const filteredData = useMemo(() => {
+  //   if (!Array.isArray(contacts)) return [];
 
-    let data = contacts;
+  //   let data = contacts;
 
-    //? Filtrar por estado de revisión
-    if (filter === "Archived") {
-      data = data.filter((item) => item.guest_statusReview === "archived");
-    }
+  //   //? Filtrar por estado de revisión
+  //   if (filter === "Archived") {
+  //     data = data.filter((item) => item.guest_statusReview === "archived");
+  //   }
 
-    // Ordenar por fecha (fecha completa) en orden descendente
-    return data
-      .slice() // Clonar el array para evitar mutaciones
-      .sort((a, b) => new Date(b.guest_DateReview) - new Date(a.guest_DateReview));
-  }, [filter, contacts]);
-
-  const sortedContacts = useMemo(() => {
-    return [...contacts].sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [contacts]);
+  //   // Ordenar por fecha (fecha completa) en orden descendente
+  //   return data
+  //     .slice() 
+  //     .sort(
+  //       (a, b) => new Date(b.guest_DateReview) - new Date(a.guest_DateReview)
+  //     );
+  // }, [filter, contacts]);
 
   //?Función para manejar el cambio de filtro
-  const handleFilterChange = useCallback((newFilter) => {
-    setFilter(newFilter);
-  });
+  // const handleFilterChange = useCallback((newFilter) => {
+  //   setFilter(newFilter);
+  // });
 
   //? Función para el manejo del botón Archived
   const handleArchiveClick = (id) => {
@@ -64,18 +65,18 @@ const Contact = () => {
   };
 
   //? Función para renderizar los datos en las celdas según la columna
-  const renderCellContent = (item, col) => {
-    switch (col) {
-      case "Order Id":
+  const renderCellContent = (item, column) => {
+    switch (column) {
+      case "order_id":
         return <span>#{item.guest_idReview}</span>;
-      case "Date":
+      case "date":
         return (
           <div>
             <span>{item.guest_timeDateReview}</span> -{" "}
             <span>{item.guest_DateReview}</span>
           </div>
         );
-      case "Customer":
+      case "customer":
         return (
           <div>
             {/* <img src={item.img} alt="guest img" width="30" height="30" /> */}
@@ -86,7 +87,7 @@ const Contact = () => {
             <span>{item.guest_phone}</span>
           </div>
         );
-      case "Comment":
+      case "comment":
         return (
           <div>
             <span>{item.guest_rateReview}</span>
@@ -94,7 +95,7 @@ const Contact = () => {
             <span>{item.guest_commentReview}</span>
           </div>
         );
-      case "Action":
+      case "action":
         return (
           <button onClick={() => handleArchiveClick(item.id)}>Archived</button>
         );
@@ -103,18 +104,22 @@ const Contact = () => {
     }
   };
 
+  if (status === "loading") return <div>Loading...</div>;
+
+  if (status === "failed") return <div>Error: {error}</div>;
+
   return (
     <>
       <h1>Contact</h1>
       <TableComponent
-        columns={columns}
-        data={filteredData}
-        onFilterChange={handleFilterChange}
-        currentFilter={filter}
-        selectors={selectors}
+        cols={columns}
+        data={contacts}
         renderCellContent={renderCellContent}
-        defaultSortColumn="Date"
-        defaultSortDirection="desc"
+        // onFilterChange={handleFilterChange}
+        // currentFilter={filter}
+        // selectors={selectors}
+        // defaultSortColumn="Date"
+        // defaultSortDirection="desc"
       />
     </>
   );
