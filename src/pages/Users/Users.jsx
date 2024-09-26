@@ -18,7 +18,7 @@ const Users = () => {
   const error = useSelector((state) => state.users.error);
 
   const [searchText, setSearchText] = useState("");
-  const [currentPageIndex, setCurrentPageIndex] = useState(1);
+  const [currentPageIndex, setCurrentPageIndex] = useState("");
 
   //? Dispatch para cargar los datos al montar el componente
   useEffect(() => {
@@ -27,17 +27,13 @@ const Users = () => {
     }
   }, [dispatch, status]);
 
-  // const handleFilterChange = (newFilter) => {
-  //   setCurrentFilter(newFilter);
-  // };
-
   const handleSearchChange = (e) => {
     setSearchText(e.target.value);
     dispatch(searchUserByName(e.target.value));
   };
 
   const handleStatusFilter = (status) => {
-    setCurrentPageIndex(1);
+    setCurrentPageIndex("");
     dispatch(filterUsersByStatus(status));
   };
 
@@ -84,6 +80,14 @@ const Users = () => {
     }
   };
 
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (status === "failed") {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div>
       <h1>Users</h1>
@@ -111,11 +115,9 @@ const Users = () => {
       <TableComponent
         selectors={selectors}
         data={filteredUsers}
-        // data={users}
         currentPageIndex={currentPageIndex}
         columns={columns}
         onFilterChange={handleStatusFilter}
-        // currentFilter={currentFilter}
         renderCellContent={renderCellContent}
         defaultSortColumn={users.joined}
         defaultSortDirection="asc"
