@@ -183,7 +183,7 @@ TableComponent.propTypes = {
   renderCellContent: PropTypes.func.isRequired,
   data: PropTypes.array.isRequired,
   onFilterChange: PropTypes.func.isRequired,
-  currentFilter: PropTypes.string.isRequired,
+  // currentFilter: PropTypes.string.isRequired,
   defaultSortColumn: PropTypes.string,
   defaultSortDirection: PropTypes.oneOf(["asc", "desc"]),
 };

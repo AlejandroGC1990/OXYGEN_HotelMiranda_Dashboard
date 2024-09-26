@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserss } from "../../features/users/usersThunk";
+import { fetchUsers } from "../../features/users/usersThunk";
 import {
   changeStatus,
   pending,
@@ -26,9 +26,9 @@ const usersSlice = createSlice({
       );
     },
     searchUserByName: (state, action) => {
-      const searchText = action.payload.toLoweCase();
+      const searchText = action.payload.toLowerCase();
       state.filteredUsers = state.users.filter((user) =>
-        user.nme.toLoweCase().includes(searchText)
+        user.name.toLowerCase().includes(searchText)
       );
     },
     sortUsersByColumn: (state, action) => {
@@ -42,14 +42,15 @@ const usersSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserss.pending, (state) => {
+      .addCase(fetchUsers.pending, (state) => {
         pending(state);
       })
-      .addCase(fetchUserss.fulfilled, (state, action) => {
+      .addCase(fetchUsers.fulfilled, (state, action) => {
         changeStatus(state, promiseStatus.FULFILLED);
         state.users = action.payload;
+        state.filteredUsers = action.payload;
       })
-      .addCase(fetchUserss.rejected, (state, action) => {
+      .addCase(fetchUsers.rejected, (state, action) => {
         rejected(state, action);
       });
   },
