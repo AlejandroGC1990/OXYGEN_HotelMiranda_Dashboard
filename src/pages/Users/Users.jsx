@@ -1,57 +1,63 @@
-import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import TableComponent from "../components/Table/Table";
-import {
-  filterUsersByStatus,
-  searchUserByName,
-  sortUsersByColumn,
-} from "../../features/users/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../../features/users/usersThunk";
+// import { filterUsersByStatus, searchUserByName } from "../../features/users/usersSlice";
+import TableComponent from "../components/Table/Table";
+// import {
+//   filterUsersByStatus,
+//   searchUserByName,
+// } from "../../features/users/usersSlice";
 
 const Users = () => {
   const dispatch = useDispatch();
 
   //? Obtenemos los datos y el estado del slice de users
-  const users = useSelector((state) => state.users.users);
-  const filteredUsers = useSelector((state) => state.users.filteredUsers);
-  const status = useSelector((state) => state.users.status);
-  const error = useSelector((state) => state.users.error);
+  const { users, filteredUsers, status, error } = useSelector(
+    (state) => state.users
+  );
 
-  const [searchText, setSearchText] = useState("");
-  const [currentPageIndex, setCurrentPageIndex] = useState("");
+  // const [searchText, setSearchText] = useState("");
+  // const [currentPageIndex, setCurrentPageIndex] = useState("");
 
   //? Dispatch para cargar los datos al montar el componente
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchUsers());
     }
+   
   }, [dispatch, status]);
 
-  const handleSearchChange = (e) => {
-    setSearchText(e.target.value);
-    dispatch(searchUserByName(e.target.value));
-  };
+  // const handleSearchChange = (e) => {
+  //   setSearchText(e.target.value);
+  //   dispatch(searchUserByName(e.target.value));
+  // };
 
-  const handleStatusFilter = (status) => {
-    setCurrentPageIndex("");
-    dispatch(filterUsersByStatus(status));
-  };
+  // const handleStatusFilter = (status) => {
+  //   setCurrentPageIndex("");
+  //   dispatch(filterUsersByStatus(status));
+  // };
 
   // const handleSortChange = (column) => {
   //   dispatch(sortUsersByColumn({ column, direction: "asc" }));
   // };
 
-  const selectors = [
-    { label: "All Employees", value: "All" },
-    { label: "Active Employees", value: "Active" },
-    { label: "Inactive Employees", value: "Inactive" },
+  // const selectors = [
+  //   { label: "All Employees", value: "All" },
+  //   { label: "Active Employees", value: "Active" },
+  //   { label: "Inactive Employees", value: "Inactive" },
+  // ];
+
+  const columns = [
+    { header: "Name", accessor: "name" },
+    { header: "Job Description", accessor: "jobDescription" },
+    { header: "Contact", accessor: "contact" },
+    { header: "Status", accessor: "status" },
   ];
 
-  const columns = ["Name", "Job Description", "Contact", "Status"];
-
   const renderCellContent = (user, column) => {
+    console.log(user);
     switch (column) {
-      case "Name":
+      case "name":
         return (
           <div>
             <img
@@ -65,11 +71,11 @@ const Users = () => {
             </div>
           </div>
         );
-      case "Job Description":
+      case "jobDescription":
         return user.jobDescription;
-      case "Contact":
+      case "contact":
         return user.contact;
-      case "Status":
+      case "status":
         return (
           <span style={{ color: user.status === "Active" ? "green" : "red" }}>
             {user.status}
@@ -87,19 +93,19 @@ const Users = () => {
   if (status === "failed") {
     return <div>Error: {error}</div>;
   }
+  console.log("Users data:", users);
 
   return (
     <div>
       <h1>Users</h1>
-      <input
+      {/* <input
         type="text"
         value={searchText}
         onChange={handleSearchChange}
         placeholder="Search by name"
-      />
-      {/* 
+      /> */}
       
-      <div>
+      {/* <div>
         {selectors.map((selector) => (
           <button
             key={selector.value}
@@ -113,14 +119,15 @@ const Users = () => {
 
       {/* Table */}
       <TableComponent
-        selectors={selectors}
-        data={filteredUsers}
-        currentPageIndex={currentPageIndex}
         columns={columns}
-        onFilterChange={handleStatusFilter}
+        // data={filteredUsers}
+        data={users}
         renderCellContent={renderCellContent}
-        defaultSortColumn={users.joined}
-        defaultSortDirection="asc"
+        // selectors={selectors}
+        // currentPageIndex={currentPageIndex}
+        // onFilterChange={handleStatusFilter}
+        // defaultSortColumn={users.joined}
+        // defaultSortDirection="asc"
       />
     </div>
   );

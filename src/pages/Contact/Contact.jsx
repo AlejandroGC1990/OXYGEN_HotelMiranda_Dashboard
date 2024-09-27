@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { fetchContacts } from "../../features/contact/contactThunk";
 import { useDispatch, useSelector } from "react-redux";
 import TableComponent from "../components/Table/Table";
 
 const Contact = () => {
   const dispatch = useDispatch();
+  
   //? Obtenemos los datos y el estado del slice de contacts
   const contacts = useSelector((state) => state.contact.contacts || []);
   const status = useSelector((state) => state.contact.status);

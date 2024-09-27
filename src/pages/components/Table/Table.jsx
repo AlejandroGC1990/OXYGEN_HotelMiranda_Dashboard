@@ -154,7 +154,8 @@ const Tabla = ({ cols, data, renderCellContent }) => {
             {currentRecords.map((row) => (
               <tr key={row.id}>
                 {cols.map((col) => (
-                  <td key={`${row.id}-${col.accessor}`}>
+                  <td key={`${col.accessor}`}>
+                  {/* <td key={`${row.id}-${col.accessor}`}> */}
                     {renderCellContent(row, col.accessor)}
                   </td>
                 ))}

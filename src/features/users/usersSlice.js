@@ -10,7 +10,6 @@ import {
 const initialState = {
   users: [],
   filteredUsers: [],
-  searchText: "",
   status: promiseStatus.IDLE,
   error: null,
 };
@@ -25,20 +24,20 @@ const usersSlice = createSlice({
         (user) => user.status === status || status === "All"
       );
     },
-    searchUserByName: (state, action) => {
-      const searchText = action.payload.toLowerCase();
-      state.filteredUsers = state.users.filter((user) =>
-        user.name.toLowerCase().includes(searchText)
-      );
-    },
-    sortUsersByColumn: (state, action) => {
-      const { column, direction } = action.payload;
-      state.filteredUsers = [...state.filteredUsers].sort((a, b) => {
-        if (a[column] < b[column]) return direction === "asc" ? -1 : 1;
-        if (a[column] > b[column]) return direction === "asc" ? 1 : -1;
-        return 0;
-      });
-    },
+    // searchUserByName: (state, action) => {
+    //   const searchText = action.payload.toLowerCase();
+    //   state.filteredUsers = state.users.filter((user) =>
+    //     user.name.toLowerCase().includes(searchText)
+    //   );
+    // },
+    // sortUsersByColumn: (state, action) => {
+    //   const { column, direction } = action.payload;
+    //   state.filteredUsers = [...state.filteredUsers].sort((a, b) => {
+    //     if (a[column] < b[column]) return direction === "asc" ? -1 : 1;
+    //     if (a[column] > b[column]) return direction === "asc" ? 1 : -1;
+    //     return 0;
+    //   });
+    // },
   },
   extraReducers: (builder) => {
     builder
@@ -56,6 +55,6 @@ const usersSlice = createSlice({
   },
 });
 
-export const { filterUsersByStatus, searchUserByName, sortUsersByColumn } =
+export const { filterUsersByStatus /*, searchUserByName, sortUsersByColumn*/ } =
   usersSlice.actions;
 export default usersSlice.reducer;
