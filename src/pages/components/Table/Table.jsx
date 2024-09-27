@@ -1,134 +1,202 @@
-import { useState, useMemo } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import PropTypes from "prop-types";
-// import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import "./__table.scss";
-import PaginationComponent from "./Pagination";
 
 const TableWrapper = styled.div`
   width: 100%;
-  padding: 20px;
-`;
+  overflow-x: auto;
+  margin-bottom: 20px;
 
-const StyledTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHeader = styled.thead`
-  background-color: #f5f5f5;
-
-  th {
-    padding: 10px;
-    border-bottom: 2px solid #ddd;
-    text-align: left;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
   }
-`;
 
-const TableBody = styled.tbody`
+  th,
   td {
-    padding: 10px;
+    max-width: 200px;
+    overflow-wrap: break-word;
+    white-space: normal;
+    padding: 0.75rem 1rem;
+    text-align: left;
     border-bottom: 1px solid #ddd;
   }
+
+  th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+
+  tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+  }
+
+  tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+
+  td button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  td button:hover {
+    background-color: #0056b3;
+  }
 `;
 
-const SelectorWrapper = styled.div`
-  margin-bottom: 20px;
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+
+  button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+`;
+
+const Tabs = styled.div`
   display: flex;
   justify-content: flex-start;
-  gap: 10px;
+  margin-bottom: 20px;
+
+  button {
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+  button:hover {
+    background-color: #e0e0e0;
+  }
 `;
+const Tabla = ({ cols, data, renderCellContent }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [recordsPerPage] = useState(10);
 
-// const SearchInput = styled.input`
-//   padding: 5px;
-//   border: 1px solid #ccc;
-//   border-radius: 4px;
-// `;
+  const totalRecords = data.length;
+  const totalPages = Math.ceil(totalRecords / recordsPerPage);
 
-const TableComponent = ({ selectors, columns, data, onFilterChange, currentFilter, renderCellContent  }) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(1); //?Almacena el íncide de la página actual de la tabla.
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = data.slice(indexOfFirstRecord, indexOfLastRecord);
 
-  const ITEMS_PER_PAGE = 10;
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  //?  selecciona los datos para mostrar en la página actual con slice
-  //?(paginar es tomar un subconjunto de los datos totales).
-  const paginatedData = useMemo(() => {
-    const start = (currentPageIndex - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    return data.slice(start, end);
-  }, [currentPageIndex, data]);
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
 
-  //?  Calcula el número total de páginas dividiendo la longitud de los datos por ITEMS_PER_PAGE
-  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+    if (currentPage > 3) {
+      pageNumbers.push(1);
+      if (currentPage > 4) {
+        pageNumbers.push("...");
+      }
+    }
 
-  // const handleDragEnd = (result) => {
-  //   if (!result.destination) {
-  //     return;
-  //   }
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
 
-  //   const reorderedItems = Array.from(paginatedData);
-  //   const [movedItem] = reorderedItems.splice(result.source.index, 1);
-  //   reorderedItems.splice(result.destination.index, 0, movedItem);
+    if (currentPage < totalPages - 2) {
+      if (currentPage < totalPages - 3) {
+        pageNumbers.push("...");
+      }
+      pageNumbers.push(totalPages);
+    }
 
-  //   //? Actualizar el estado con el nuevo orden
-  //   setPaginatedData(reorderedItems);
-  // };
+    return pageNumbers;
+    // return pageNumbers.map((number, index) => (
+    //   <button
+    //     key={index}
+    //     onClick={() => paginate(number)}
+    //     disabled={number === currentPage}
+    //   >
+    //     {number}
+    //   </button>
+    // ));
+  };
 
   return (
-    <TableWrapper>
-      {/* Selectores */}
-      <SelectorWrapper>
-        {selectors.map((filter, index) => (
-          <button
-            key={index}
-            onClick={() => onFilterChange(filter.value)}
-            className={currentFilter === filter.value ? "active" : ""}
-          >
-            {filter.label}
-          </button>
-        ))}
-      </SelectorWrapper>
-
-      {/* Tabla */}
-      <StyledTable>
-        <TableHeader>
-          <tr>
-            {columns.map((col, index) => (
-              <th key={index}>{col}</th>
-            ))}
-          </tr>
-        </TableHeader>
-        <TableBody>
-          {paginatedData.map((item, index) => (
-            <tr key={index}>
-              {columns.map((col) => (
-                <td key={col}>{renderCellContent(item, col)}</td>
+    <>
+      <TableWrapper>
+        <table>
+          <thead>
+            <tr>
+              {cols.map((col) => (
+                <th key={col.accessor}>{col.header}</th>
               ))}
             </tr>
-          ))}
-        </TableBody>
-      </StyledTable>
+          </thead>
+          <tbody>
+            {currentRecords.map((row) => (
+              <tr key={row.id}>
+                {cols.map((col) => (
+                  <td key={`${col.accessor}`}>
+                  {/* <td key={`${row.id}-${col.accessor}`}> */}
+                    {renderCellContent(row, col.accessor)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </TableWrapper>
 
-      {/* Paginación */}
-      <PaginationComponent
-        currentPageIndex={currentPageIndex}
-        totalPages={totalPages}
-        onPrevious={() => setCurrentPageIndex((prev) => Math.max(prev - 1, 1))}
-        onNext={() =>
-          setCurrentPageIndex((prev) => Math.min(prev + 1, totalPages))
-        }
-      />
-    </TableWrapper>
+      <Pagination>
+        <div className="pagination-controls">
+          <button onClick={() => paginate(1)} disabled={currentPage === 1}>
+            &laquo; First
+          </button>
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            &lsaquo; Previous
+          </button>
+          {renderPageNumbers().map((number, index) => (
+            <button key={number} onClick={() => paginate(number)}>
+              {number}
+            </button>
+          ))}
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next &rsaquo;
+          </button>
+          <button
+            onClick={() => paginate(totalPages)}
+            disabled={currentPage === totalPages}
+          >
+            Last &raquo;
+          </button>
+        </div>
+      </Pagination>
+    </>
   );
 };
 
-TableComponent.propTypes = {
-  selectors: PropTypes.array.isRequired,
-  columns: PropTypes.array.isRequired,
-  renderCellContent: PropTypes.func.isRequired,
-  data: PropTypes.array.isRequired,
-  onFilterChange: PropTypes.func.isRequired,
-  currentFilter: PropTypes.string.isRequired,
-};
-
-export default TableComponent;
+export default Tabla;
