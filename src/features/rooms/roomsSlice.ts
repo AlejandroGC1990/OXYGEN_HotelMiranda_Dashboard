@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { fetchRooms } from "../../features/rooms/roomsThunk";
-import { changeStatus, pending, promiseStatus, rejected } from "../../utils/promises.js";
+import { changeStatus, pending, promiseStatus, rejected } from "../../utils/promises";
 
 interface RoomState {
   rooms: Room[];

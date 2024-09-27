@@ -1,7 +1,11 @@
 export const promiseStatus = {
+  // IDLE: "idle",
   IDLE: "IDLE",
+  // PENDING: "pending",
   PENDING: "PENDING",
+  // FULFILLED: "fulfilled",
   FULFILLED: "FULFILLED",
+  // REJECTED: "rejected",
   REJECTED: "REJECTED",
 } as const; //? `as const` asegura que los valores sean literales de string y no solo `string`
 
