@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchContacts } from "../../features/contact/contactThunk";
 import { useDispatch, useSelector } from "react-redux";
 import TableComponent from "../components/Table/Table";
@@ -12,13 +12,32 @@ const Contact = () => {
   const error = useSelector((state) => state.contact.error);
 
   // const [filter, setFilter] = useState("All"); //? Añadido estado para el filtro
+  const [promiseStatus, setPromiseStatus] = useState(null);
+
 
   //? Conseguir los contactos al cargar el componente
+  // useEffect(() => {
+  //   // if (status === "idle") {
+  //     if (status === promiseStatus.IDLE) {
+  //     dispatch(fetchContacts());
+  //   }
+  // }, [dispatch, status]);
   useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchContacts());
-    }
-  }, [dispatch, status]);
+    const fetchData = async () => {
+        setPromiseStatus('loading');
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/contact/`);
+            const data = await response.json();
+            setPromiseStatus('success');
+        } catch (error) {
+            console.error(error);
+            setPromiseStatus('error');
+        }
+    };
+
+    fetchData();
+}, []);
 
   //? Filtros para la página de Contact
   // const selectors = [

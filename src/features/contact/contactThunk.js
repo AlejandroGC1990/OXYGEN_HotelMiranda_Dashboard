@@ -36,11 +36,12 @@ const delayTime = 1500;
 export const fetchContacts = createAsyncThunk("contact/getAll", async () => {
   await delay(delayTime);
 
-  const response = await fetch(`${process.env.REACT_APP_API_URL}/contacts`); 
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/contact`); 
   if (!response.ok) {
     throw new Error('Error al obtener los contactos');
   }
   
   const data = await response.json();
+  console.log(contact, data)
   return data; 
 });

@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchContacts, archiveContact } from "./contactThunk";
+import { fetchContacts } from "./contactThunk";
+// import { fetchContacts, archiveContact } from "./contactThunk";
 import {
   changeStatus,
   pending,
@@ -28,20 +29,23 @@ const contactSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchContacts.pending, (state) => {
-        pending(state);
+        // pending(state);
+        state.status = promiseStatus.LOADING;
       })
       .addCase(fetchContacts.fulfilled, (state, action) => {
-        changeStatus(state, promiseStatus.FULFILLED);
+        // changeStatus(state, promiseStatus.FULFILLED);
+        state.status = promiseStatus.FULFILLED;
         state.contacts = action.payload;
         state.filteredContacts = action.payload;
       })
       .addCase(fetchContacts.rejected, (state, action) => {
-        rejected(state, action);
+        // rejected(state, action);
+        state.status = promiseStatus.FAILED;
         state.error = action.error.message;
       })
-      .addCase(archiveContact.fulfilled, (state, action) => {
-        state.contacts = action.payload; //? Actualiza la lista de contactos
-      });
+      // .addCase(archiveContact.fulfilled, (state, action) => {
+      //   state.contacts = action.payload; //? Actualiza la lista de contactos
+      // });
   },
 });
 
