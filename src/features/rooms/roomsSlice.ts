@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { fetchRooms } from "../../features/rooms/roomsThunk";
+import { Room } from "../../types/Rooms";
 import { changeStatus, pending, promiseStatus, rejected } from "../../utils/promises";
 
 interface RoomState {
   rooms: Room[];
   filteredRooms: Room[];
-  status: promiseStatus;
+//   status: promiseStatus;
+  status: typeof promiseStatus;
   error: string | null;
 }
 

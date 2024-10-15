@@ -37,6 +37,7 @@ const contactSlice = createSlice({
       })
       .addCase(fetchContacts.rejected, (state, action) => {
         rejected(state, action);
+        state.error = action.error.message;
       })
       .addCase(archiveContact.fulfilled, (state, action) => {
         state.contacts = action.payload; //? Actualiza la lista de contactos
