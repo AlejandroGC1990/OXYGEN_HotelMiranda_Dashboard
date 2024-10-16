@@ -1,22 +1,32 @@
-import { useState } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import "./__login.scss";
 import { useAuth } from "../../hooks/useAuth";
 
-const Login = () => {
-  const [credentials, setCredentials] = useState({
-    username: "",
-    password: "",
-  });
-  const [error, setError] = useState("");
-  const {login, isLogedIn} = useAuth(); //?Obtener login y el estado isLoggedIn del contexto 
+interface Credentials {
+  user_name: string;
+  user_password: string;
+}
 
-  const handleChange = (e) => {
+const Login = () => {
+  const [credentials, setCredentials] = useState<Credentials>({
+    user_name: "",
+    user_password: "",
+  });
+  const [error, setError] = useState<string>(""); //? Estado para manejar el error con tipo string
+  const {login, isLoggedIn } = useAuth(); //? Obtener login y el estado isLoggedIn del contexto 
+
+  //? Manejar el cambio en los inputs, con el tipo de evento ChangeEvent<HTMLInputElement>
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  //? Manejar el envío del formulario, con el tipo de evento FormEvent<HTMLFormElement>
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!login(credentials)) {
+
+    try {
+      await login(credentials);
+    } catch (err) {
       setError("Usuario o contraseña incorrectos");
     }
   };
@@ -33,7 +43,7 @@ const Login = () => {
             <input
               className="modalOverlay__content__input"
               type="text"
-              name="username"
+              name="user_name"
               onChange={handleChange}
               required
             />
@@ -43,7 +53,7 @@ const Login = () => {
             <input
               className="modalOverlay__content__input"
               type="password"
-              name="password"
+              name="user_password"
               onChange={handleChange}
               required
             />
