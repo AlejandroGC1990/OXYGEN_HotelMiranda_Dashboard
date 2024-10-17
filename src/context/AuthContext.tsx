@@ -1,4 +1,4 @@
-import { createContext, useEffect, useReducer, ReactNode, FC  } from "react";
+import { createContext, useEffect, useReducer, ReactNode, FC } from "react";
 import {
   login as loginService,
   logout as logoutService,
@@ -6,6 +6,7 @@ import {
 } from "../utils/auth";
 import { authReducer } from "./authReducer";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 //? Interfaz de credenciales
 interface Credentials {
@@ -36,7 +37,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 //? Estado inicial de autenticación
 const initialState: AuthState = {
   isLoggedIn: isAuthenticated(),
-  user: null,
+  user: Cookies.get("user") ? JSON.parse(Cookies.get("user")!).user_name : null,
 };
 
 //? Componente AuthProvider
@@ -63,12 +64,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     //? Verificar si el usuario ya está autenticado al cargar la página
-    if (isAuthenticated()) {
-      const user = localStorage.getItem("user");
-      if (user) {
-        dispatch({ type: "LOGIN", payload: JSON.parse(user).user_name });
-      }
-    } else {
+    if (!isAuthenticated()) {
       navigate("/login");
     }
   }, []);

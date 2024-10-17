@@ -1,43 +1,32 @@
-import { useEffect, useState } from "react";
-import { fetchContacts } from "../../features/contact/contactThunk";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import TableComponent from "../components/Table/Table";
+import { fetchContacts } from "../../features/contact/contactThunk";
+import TableComponent from "../components/Table/Table.jsx";
+import Cookies from "js-cookie";
+import { RootState } from "../../app/store";
 
 const Contact = () => {
   const dispatch = useDispatch();
-  
-  //? Obtenemos los datos y el estado del slice de contacts
-  const contacts = useSelector((state) => state.contact.contacts || []);
-  const status = useSelector((state) => state.contact.status);
-  const error = useSelector((state) => state.contact.error);
+  const contacts = useSelector((state: RootState) => state.contact.contacts);
+  const loading = useSelector((state: RootState) => state.contact.loading);
+  const error = useSelector((state: RootState) => state.contact.error);
 
-  // const [filter, setFilter] = useState("All"); //? Añadido estado para el filtro
-  const [promiseStatus, setPromiseStatus] = useState(null);
+  //? Función para obtener el token desde las cookies
+  const fetchData = async () => {
+    const token = Cookies.get("user");
 
+    if (!token) {
+      console.error("No auth token found");
+      return;
+    }
 
-  //? Conseguir los contactos al cargar el componente
-  // useEffect(() => {
-  //   // if (status === "idle") {
-  //     if (status === promiseStatus.IDLE) {
-  //     dispatch(fetchContacts());
-  //   }
-  // }, [dispatch, status]);
+    //? Despacha el thunk para obtener los contactos
+    dispatch(fetchContacts(token));
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-        setPromiseStatus('loading');
-
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/contact/`);
-            const data = await response.json();
-            setPromiseStatus('success');
-        } catch (error) {
-            console.error(error);
-            setPromiseStatus('error');
-        }
-    };
-
-    fetchData();
-}, []);
+    fetchData(); //? Llama a la función para cargar los datos al montar el componente
+  }, [dispatch]);
 
   //? Filtros para la página de Contact
   // const selectors = [
@@ -67,7 +56,7 @@ const Contact = () => {
 
   //   // Ordenar por fecha (fecha completa) en orden descendente
   //   return data
-  //     .slice() 
+  //     .slice()
   //     .sort(
   //       (a, b) => new Date(b.guest_DateReview) - new Date(a.guest_DateReview)
   //     );
@@ -135,11 +124,11 @@ const Contact = () => {
         cols={columns}
         data={contacts}
         renderCellContent={renderCellContent}
-        // onFilterChange={handleFilterChange}
-        // currentFilter={filter}
-        // selectors={selectors}
-        // defaultSortColumn="Date"
-        // defaultSortDirection="desc"
+      // onFilterChange={handleFilterChange}
+      // currentFilter={filter}
+      // selectors={selectors}
+      // defaultSortColumn="Date"
+      // defaultSortDirection="desc"
       />
     </>
   );
