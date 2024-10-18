@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import contactReducer from "../features/contact/contactSlice";
+import { useDispatch } from "react-redux";
 // import bookingReducer from "../features/bookings/bookingSlice";
 // import roomsReducer from "../features/rooms/roomsSlice";
 // import usersReducer from "../features/users/usersSlice";
@@ -8,7 +9,7 @@ export interface RootState {
   contact: ReturnType<typeof contactReducer>;
 }
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
     contact: contactReducer,
     // booking: bookingReducer,
@@ -18,4 +19,4 @@ const store = configureStore({
 });
 
 export type AppDispatch = typeof store.dispatch;
-export default store;
+export const useAppDispatch = () => useDispatch<AppDispatch>();

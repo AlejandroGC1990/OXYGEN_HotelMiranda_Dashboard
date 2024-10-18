@@ -10,7 +10,7 @@ import Users from "./pages/Users/Users";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Layout from "./pages/components/Layout/Layout";
 import { Provider } from "react-redux";
-import store from "./app/store";
+import {store} from "./app/store";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

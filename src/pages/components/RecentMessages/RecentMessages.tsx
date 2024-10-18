@@ -1,21 +1,26 @@
 import React from 'react';
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from '../../../app/store';
 import { archiveContact, publishContact } from "../../../features/contact/contactThunk";
 import { Contact as ContactType } from '../../../interfaces/contact';
+import Cookies from 'js-cookie';
 
 interface RecentMessagesProp {
     contact: ContactType[];
 }
 
 const RecentMessages: React.FC<RecentMessagesProp> = ({ contact }) => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
+
+    const token = Cookies.get('user') || '';
 
     const buttonArchiveClick = async (id: number) => {
-        await dispatch(archiveContact(id));
+        await dispatch(archiveContact({id, token}));
+        console.log('ARCHIVE');
     };
 
     const buttonPublishClick = async (id: number) => {
-        await dispatch(publishContact(id));
+        await dispatch(publishContact({id, token}));
+        console.log('PUBLISH');
     };
 
 

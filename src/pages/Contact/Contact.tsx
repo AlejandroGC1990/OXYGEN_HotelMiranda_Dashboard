@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { archiveContact, fetchContacts, publishContact } from "../../features/contact/contactThunk";
+import { filterContactsByStatus } from "../../features/contact/contactSlice";
+
 import Table from "../components/Table/Table";
+import RecentMessages from "../components/RecentMessages/RecentMessages";
+
 import Cookies from "js-cookie";
 import { RootState, AppDispatch } from "../../app/store";
 import { Contact as ContactType } from '../../interfaces/contact';
 import { promiseStatus } from "../../utils/promises";
-import { filterContactsByStatus } from "../../features/contact/contactSlice";
-import RecentMessages from "../components/RecentMessages/RecentMessages";
-// import { filterContactsByStatus } from "../../features/contact/contactSlice";
+
 
 const Contact: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -17,11 +19,16 @@ const Contact: React.FC = () => {
     status,
     error
   } = useSelector((state: RootState) => state.contact);
+
   const [activeTab, setActiveTab] = useState<string>('All');
+  const [filter, setFilter] = useState("All");
+
+
+  const token = Cookies.get('user') || '';
+
 
   //? Función para obtener contactos desde el servidor
   const fetchData = async () => {
-    const token = Cookies.get('user');
     if (token) {
       const resultAction = await dispatch(fetchContacts(token));
       if (fetchContacts.rejected.match(resultAction)) {
@@ -31,19 +38,26 @@ const Contact: React.FC = () => {
       console.error('No se encontró el token de autorización.');
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, []);
-  
-  const columns: { header: string; accessor: keyof ContactType }[] = useMemo(() => [
-    { header: "Order Id", accessor: "guest_idReview" },
-    { header: "Date", accessor: "guest_DateReview" },
-    { header: "Customer", accessor: "guest_name" },
-    { header: "Comment", accessor: "guest_commentReview" },
-    { header: "Action", accessor: "guest_idReview" }
-  ], []);
-  
+
+
+  const selectors = [
+    { label: "All", value: "All" },
+    { label: "Archived", value: "Archived" },
+    { label: "Published", value: "Published" }
+  ];
+
+  //? Función para cambiar el selector de la tabla
+  const filteredContacts = contacts.filter(contact => {
+    if (filter === "All") return true;
+    if (filter === "Archived") return contact.guest_statusReview === "archived";
+    if (filter === "Published") return contact.guest_statusReview === "publish";
+    return false;
+  });
+
   //? Manejar el clic para archivar
   const handleArchiveClick = useCallback(async (id: number) => {
     await dispatch(archiveContact({ id, token }));
@@ -54,6 +68,15 @@ const Contact: React.FC = () => {
     await dispatch(publishContact({ id, token }));
   }, [dispatch]);
 
+
+  const columns: { header: string; accessor: keyof ContactType }[] = useMemo(() => [
+    { header: "Order Id", accessor: "guest_idReview" },
+    { header: "Date", accessor: "guest_DateReview" },
+    { header: "Customer", accessor: "guest_name" },
+    { header: "Comment", accessor: "guest_commentReview" },
+    { header: "Action", accessor: "guest_idReview" }
+  ], []);
+
   //? Renderizado personalizado de las celdas
   const renderCellContent = useCallback((item: ContactType, column: keyof ContactType) => {
     switch (column) {
@@ -62,7 +85,7 @@ const Contact: React.FC = () => {
       case "guest_DateReview":
         return (
           <div>
-            <span>{item.guest_timeDateReview}</span> -{" "}
+            <span>{item.guest_timeDateReview}</span> - {" "}
             <span>{item.guest_DateReview}</span>
           </div>
         );
@@ -96,17 +119,6 @@ const Contact: React.FC = () => {
     }
   }, [handleArchiveClick, handlePublishClick]);
 
-  //? Función para cambiar el selector de la tabla
-  const filteredContacts = useMemo(() => {
-    if (activeTab === 'Archived') {
-      return contacts.filter(contact => contact.guest_statusReview === 'archived');
-    } else if (activeTab === 'Publish') {
-      return contacts.filter(contact => contact.guest_statusReview === 'published');
-    } else {
-      return contacts; // All contacts
-    }
-  }, [contacts, activeTab]);
-
 
   if (status === promiseStatus.PENDING) return <div>Loading...</div>;
   if (status === promiseStatus.REJECTED) return <div>Error: {error}</div>;
@@ -119,13 +131,11 @@ const Contact: React.FC = () => {
 
       <Table
         cols={columns}
-        data={contacts}
+        data={filteredContacts}
         renderCellContent={renderCellContent}
-        onFilterChange={filteredContacts}
-      // currentFilter="All"
-      // selectors={selectors}
-      // defaultSortColumn="guest_DateReview"
-      // defaultSortDirection="desc"
+        currentFilter={filter}
+        setFilter={setFilter}
+        selectors={selectors}
       />
     </>
   );

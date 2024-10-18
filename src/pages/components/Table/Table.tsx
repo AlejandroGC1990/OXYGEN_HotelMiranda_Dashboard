@@ -92,12 +92,21 @@ const Tabs = styled.div`
   }
 `;
 
-const Tabla = <T,>({ cols, data, renderCellContent }: {
+const Tabla = <T,>({
+  cols,
+  data,
+  renderCellContent,
+  selectors,
+  currentFilter,
+  setFilter
+}: {
   cols: { header: string; accessor: keyof T }[];
   data: T[];
-  renderCellContent: (item: T, column: keyof T) => React.ReactNode
+  renderCellContent: (item: T, column: keyof T) => React.ReactNode;
+  selectors: { label: string; value: string }[];
+  currentFilter: string;
+  setFilter: (filter: string) => void; 
 }) => {
-
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [recordsPerPage] = useState<number>(10);
 
@@ -108,6 +117,8 @@ const Tabla = <T,>({ cols, data, renderCellContent }: {
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const currentRecords = data.slice(indexOfFirstRecord, indexOfLastRecord);
 
+
+  //? Pagination
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const renderPageNumbers = () => {
@@ -144,8 +155,25 @@ const Tabla = <T,>({ cols, data, renderCellContent }: {
     ));
   };
 
+
   return (
     <>
+    <Tabs>
+        {selectors.map(selector => (
+          <button
+            key={selector.value}
+            onClick={() => setFilter(selector.value)}
+            style={{
+              backgroundColor: currentFilter === selector.value ? '#007bff' : '#f4f4f4',
+              color: currentFilter === selector.value ? 'white' : 'black'
+            }}
+          >
+            {selector.label}
+          </button>
+        ))}
+      </Tabs>
+
+
       <TableWrapper>
         <table>
           <thead>

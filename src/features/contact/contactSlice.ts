@@ -4,7 +4,9 @@ import {
   fetchContactById,
   addContact,
   updateContact,
-  deleteContact
+  deleteContact,
+  archiveContact,
+  publishContact
 } from "./contactThunk";
 import {
   promiseStatus,
@@ -90,6 +92,19 @@ const contactSlice = createSlice({
       .addCase(deleteContact.fulfilled, (state, action: PayloadAction<number>) => {
         state.contacts = state.contacts.filter(contact => contact.guest_idReview !== action.payload); //? Filtrar el contacto eliminado
         state.filteredContacts = state.filteredContacts.filter(contact => contact.guest_idReview !== action.payload); //? También filtrar de los contactos filtrados
+      })  
+        //?Para cambiar el estado de guest_statusReview
+        .addCase(archiveContact.fulfilled, (state, action) => {
+          const contact = state.contacts.find(c => c.guest_idReview === action.meta.arg.id);
+          if (contact) {
+            contact.guest_statusReview = 'archive';
+          }
+        })
+      .addCase(publishContact.fulfilled, (state, action) => {
+        const contact = state.contacts.find(c => c.guest_idReview === action.meta.arg.id);
+        if (contact) {
+          contact.guest_statusReview = 'publish';
+        }
       });
   },
 });
