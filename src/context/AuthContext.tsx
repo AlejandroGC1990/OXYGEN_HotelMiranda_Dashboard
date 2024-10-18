@@ -37,7 +37,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 //? Estado inicial de autenticación
 const initialState: AuthState = {
   isLoggedIn: isAuthenticated(),
-  user: Cookies.get("user") ? JSON.parse(Cookies.get("user")!).user_name : null,
+  user: Cookies.get("user") || null,
 };
 
 //? Componente AuthProvider

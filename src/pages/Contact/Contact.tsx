@@ -1,94 +1,95 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchContacts } from "../../features/contact/contactThunk";
-import TableComponent from "../components/Table/Table.jsx";
+import Table from "../components/Table/Table";
 import Cookies from "js-cookie";
-import { RootState } from "../../app/store";
+import { RootState, AppDispatch } from "../../app/store";
+import { Contact as ContactType } from '../../interfaces/contact';
+import { promiseStatus } from "../../utils/promises";
+// import { filterContactsByStatus } from "../../features/contact/contactSlice";
 
-const Contact = () => {
-  const dispatch = useDispatch();
-  const contacts = useSelector((state: RootState) => state.contact.contacts);
-  const loading = useSelector((state: RootState) => state.contact.loading);
-  const error = useSelector((state: RootState) => state.contact.error);
+const Contact: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const { filteredContacts:
+    contacts,
+    status,
+    error
+  } = useSelector((state: RootState) => state.contact);
 
-  //? Función para obtener el token desde las cookies
+  //? Función para obtener contactos desde el servidor
   const fetchData = async () => {
-    const token = Cookies.get("user");
-
-    if (!token) {
-      console.error("No auth token found");
-      return;
+    const token = Cookies.get('user'); 
+    if (token) {
+      const resultAction = await dispatch(fetchContacts(token));
+      if (fetchContacts.rejected.match(resultAction)) {
+        console.error('Error al obtener contactos:', resultAction.error.message);
+      }
+    } else {
+      console.error('No se encontró el token de autorización.');
     }
-
-    //? Despacha el thunk para obtener los contactos
-    dispatch(fetchContacts(token));
   };
-
-  useEffect(() => {
-    fetchData(); //? Llama a la función para cargar los datos al montar el componente
-  }, [dispatch]);
-
-  //? Filtros para la página de Contact
-  // const selectors = [
-  //   { value: "All", label: "All Reviews" },
-  //   { value: "Archived", label: "Archived" },
-  // ];
-
-  //?Función para gestionar las columnas de la tabla de contacto
-  const columns = [
-    { header: "Order Id", accessor: "order_id" },
-    { header: "Date", accessor: "date" },
-    { header: "Customer", accessor: "customer" },
-    { header: "Comment", accessor: "comment" },
-    { header: "Action", accessor: "action" },
-  ];
-
-  //?Function para filtrar datos basados en el filtro seleccionado
-  // const filteredData = useMemo(() => {
-  //   if (!Array.isArray(contacts)) return [];
-
-  //   let data = contacts;
-
-  //   //? Filtrar por estado de revisión
-  //   if (filter === "Archived") {
-  //     data = data.filter((item) => item.guest_statusReview === "archived");
+  // const fetchData = useCallback(async () => {
+  //   const token = Cookies.get("user");
+  //   if (!token) {
+  //     console.error("No auth token found");
+  //     return;
   //   }
 
-  //   // Ordenar por fecha (fecha completa) en orden descendente
-  //   return data
-  //     .slice()
-  //     .sort(
-  //       (a, b) => new Date(b.guest_DateReview) - new Date(a.guest_DateReview)
-  //     );
-  // }, [filter, contacts]);
+  //   try {
+  //     const result = await dispatch(fetchContacts(token)); 
+  //     if (!fetchContacts.rejected.match(result)) {
+  //       console.log("Resultado de la API:", result);
+  //     } else {
+  //       console.error("Error al obtener los contactos:", result.error.message);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error al obtener los contactos:", err);
+  //   }
+  // }, [dispatch]);
 
-  //?Función para manejar el cambio de filtro
-  // const handleFilterChange = useCallback((newFilter) => {
-  //   setFilter(newFilter);
-  // });
+  useEffect(() => {
+    fetchData();
+  }, []);
+  // }, [fetchData]);
 
-  //? Función para el manejo del botón Archived
-  const handleArchiveClick = (id) => {
-    dispatch(archiveContact(id));
-    setFilter("Archived");
-  };
+  // const selectors = [
+  //   { value: "All", label: "All Reviews" },
+  //   { value: "archived", label: "Archived" },
+  // ];
 
-  //? Función para renderizar los datos en las celdas según la columna
-  const renderCellContent = (item, column) => {
+  const columns: { header: string; accessor: keyof ContactType }[] = useMemo(() => [
+    { header: "Order Id", accessor: "guest_idReview" },
+    { header: "Date", accessor: "guest_DateReview" },
+    { header: "Customer", accessor: "guest_name" },
+    { header: "Comment", accessor: "guest_commentReview" },
+    // { header: "Action", accessor: "id" },
+  ], []);
+
+  // //? Función para cambiar el filtro
+  // const handleFilterChange = useCallback((newFilter: string) => {
+  //   dispatch(filterContactsByStatus(newFilter));
+  // }, [dispatch]);
+
+  // //? Manejar el clic para archivar
+  // const handleArchiveClick = useCallback((id: number) => {
+  //   console.log(`Archivar contacto con id: ${id}`);
+  // }, []);
+
+  //? Renderizado personalizado de las celdas
+  const renderCellContent = useCallback((item: ContactType, column: keyof ContactType) => {
     switch (column) {
-      case "order_id":
+      case "guest_idReview":
         return <span>#{item.guest_idReview}</span>;
-      case "date":
+      case "guest_DateReview":
         return (
           <div>
             <span>{item.guest_timeDateReview}</span> -{" "}
             <span>{item.guest_DateReview}</span>
           </div>
         );
-      case "customer":
+      case "guest_name":
         return (
           <div>
-            {/* <img src={item.img} alt="guest img" width="30" height="30" /> */}
             <span>{item.guest_name}</span>
             <br />
             <span>{item.guest_email}</span>
@@ -96,7 +97,7 @@ const Contact = () => {
             <span>{item.guest_phone}</span>
           </div>
         );
-      case "comment":
+      case "guest_commentReview":
         return (
           <div>
             <span>{item.guest_rateReview}</span>
@@ -104,31 +105,31 @@ const Contact = () => {
             <span>{item.guest_commentReview}</span>
           </div>
         );
-      case "action":
-        return (
-          <button onClick={() => handleArchiveClick(item.id)}>Archived</button>
-        );
+      // case "id":
+      //   return (
+      //     <button onClick={() => handleArchiveClick(item.id)}>Archive</button>
+      //   );
       default:
         return null;
     }
-  };
+  }, []);
+  // }, [handleArchiveClick]);
 
-  if (status === "loading") return <div>Loading...</div>;
-
-  if (status === "failed") return <div>Error: {error}</div>;
+  if (status === promiseStatus.PENDING) return <div>Loading...</div>;
+  if (status === promiseStatus.REJECTED) return <div>Error: {error}</div>;
 
   return (
     <>
       <h1>Contact</h1>
-      <TableComponent
+      <Table
         cols={columns}
         data={contacts}
         renderCellContent={renderCellContent}
-      // onFilterChange={handleFilterChange}
-      // currentFilter={filter}
-      // selectors={selectors}
-      // defaultSortColumn="Date"
-      // defaultSortDirection="desc"
+        // onFilterChange={handleFilterChange}
+        // currentFilter="All"
+        // selectors={selectors}
+        // defaultSortColumn="guest_DateReview"
+        // defaultSortDirection="desc"
       />
     </>
   );

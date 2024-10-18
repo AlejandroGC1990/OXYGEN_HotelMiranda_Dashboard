@@ -1,30 +1,19 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchContacts, fetchContactById, addContact, updateContact, deleteContact } from "./contactThunk";
+import {
+  fetchContacts,
+  fetchContactById,
+  addContact,
+  updateContact,
+  deleteContact
+} from "./contactThunk";
 import {
   promiseStatus,
 } from "../../utils/promises";
-
-export interface Contact {
-  guest_idReview: number;           
-  guest_timeDateReview: string;     
-  guest_DateReview: string;          
-  guest_name: string;                
-  guest_email: string;               
-  guest_phone: string;              
-  guest_rateReview: number;     
-  guest_commentReview: string;    
-  guest_statusReview: string;      
-  guest_checkIn: string;       
-  guest_checkInTime: string;    
-  guest_checkOut: string;           
-  guest_checkOutTime: string;        
-  guest_orderDateTime: string;      
-  guest_orderDate: string;                  
-  guest_room_state: string;         
-}
+import { Contact } from '../../interfaces/contact';
 
 //? Estado inicial para el slice de contactos
-interface ContactState {
+export interface ContactState {
+  pending: boolean;
   contacts: Contact[];               //? Lista de todos los contactos
   selectedContact: Contact | null;    //? Contacto seleccionado para ver detalles
   filteredContacts: Contact[];       //? Contactos filtrados por estado
@@ -35,9 +24,10 @@ interface ContactState {
 const initialState: ContactState = {
   contacts: [],
   selectedContact: null,
-  filteredContacts: [], 
+  filteredContacts: [],
   status: promiseStatus.IDLE,
   error: null,
+  pending: false,
 };
 
 const contactSlice = createSlice({
@@ -57,15 +47,19 @@ const contactSlice = createSlice({
       //? Manejo de la acción para obtener todos los contactos
       .addCase(fetchContacts.pending, (state) => {
         state.status = promiseStatus.PENDING;
+        // state.error = null;
+        state.pending = true;
       })
       .addCase(fetchContacts.fulfilled, (state, action: PayloadAction<Contact[]>) => {
-        state.status = promiseStatus.FULFILLED; 
+        state.status = promiseStatus.FULFILLED;
         state.contacts = action.payload; //? Actualizar la lista de contactos
         state.filteredContacts = action.payload; //? Actualizar los contactos filtrados
+        state.pending = false;
       })
       .addCase(fetchContacts.rejected, (state, action) => {
-        state.status = promiseStatus.REJECTED; 
+        state.status = promiseStatus.REJECTED;
         state.error = action.error.message || null; //? Capturar el mensaje de error
+        state.pending = false;
       })
       //? Manejo de la acción para obtener un contacto por ID
       .addCase(fetchContactById.fulfilled, (state, action: PayloadAction<Contact>) => {
@@ -78,9 +72,18 @@ const contactSlice = createSlice({
       })
       //? Manejo de la acción para actualizar un contacto existente
       .addCase(updateContact.fulfilled, (state, action: PayloadAction<Contact>) => {
-        const index = state.contacts.findIndex(contact => contact.guest_idReview === action.payload.guest_idReview);
+        const index = state.contacts.findIndex(
+          contact => contact.guest_idReview === action.payload.guest_idReview
+        );
         if (index !== -1) {
           state.contacts[index] = action.payload; //? Actualizar el contacto en la lista
+          //? Actualizar filteredContacts
+          const filteredIndex = state.filteredContacts.findIndex(
+            contact => contact.guest_idReview === action.payload.guest_idReview
+          );
+          if (filteredIndex !== -1) {
+            state.filteredContacts[filteredIndex] = action.payload; //? Actualizar en la lista filtrada si existe
+          }
         }
       })
       //? Manejo de la acción para eliminar un contacto

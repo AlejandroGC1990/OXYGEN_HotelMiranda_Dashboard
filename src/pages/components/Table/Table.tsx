@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 
 const TableWrapper = styled.div`
@@ -91,9 +91,15 @@ const Tabs = styled.div`
     background-color: #e0e0e0;
   }
 `;
-const Tabla = ({ cols, data, renderCellContent }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [recordsPerPage] = useState(10);
+
+const Tabla = <T,>({ cols, data, renderCellContent }: {
+  cols: { header: string; accessor: keyof T }[];
+  data: T[];
+  renderCellContent: (item: T, column: keyof T) => React.ReactNode
+}) => {
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [recordsPerPage] = useState<number>(10);
 
   const totalRecords = data.length;
   const totalPages = Math.ceil(totalRecords / recordsPerPage);
@@ -102,7 +108,7 @@ const Tabla = ({ cols, data, renderCellContent }) => {
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const currentRecords = data.slice(indexOfFirstRecord, indexOfLastRecord);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const renderPageNumbers = () => {
     const pageNumbers = [];
@@ -127,16 +133,15 @@ const Tabla = ({ cols, data, renderCellContent }) => {
       pageNumbers.push(totalPages);
     }
 
-    return pageNumbers;
-    // return pageNumbers.map((number, index) => (
-    //   <button
-    //     key={index}
-    //     onClick={() => paginate(number)}
-    //     disabled={number === currentPage}
-    //   >
-    //     {number}
-    //   </button>
-    // ));
+    return pageNumbers.map((number, index) => (
+      <button
+        key={typeof number === "number" ? number : index.toString()}
+        onClick={() => paginate(Number(number))}
+        disabled={number === currentPage}
+      >
+        {number}
+      </button>
+    ));
   };
 
   return (
@@ -145,18 +150,17 @@ const Tabla = ({ cols, data, renderCellContent }) => {
         <table>
           <thead>
             <tr>
-              {cols.map((col) => (
-                <th key={col.accessor}>{col.header}</th>
+              {cols.map((cols) => (
+                <th key={String(cols.accessor)}>{cols.header}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((row) => (
-              <tr key={row.id}>
-                {cols.map((col) => (
-                  <td key={`${col.accessor}`}>
-                  {/* <td key={`${row.id}-${col.accessor}`}> */}
-                    {renderCellContent(row, col.accessor)}
+            {currentRecords.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {cols.map((cols) => (
+                  <td key={`${String(cols.accessor)}-${rowIndex}`}>
+                    {renderCellContent(row, cols.accessor)}
                   </td>
                 ))}
               </tr>
@@ -176,11 +180,11 @@ const Tabla = ({ cols, data, renderCellContent }) => {
           >
             &lsaquo; Previous
           </button>
-          {renderPageNumbers().map((number, index) => (
-            <button key={number} onClick={() => paginate(number)}>
+          {/* {renderPageNumbers().map((number, index) => (
+            <div key={number.toString()} onClick={() => paginate(typeof number === "number" ? number : Number(number))}>
               {number}
-            </button>
-          ))}
+            </div>
+          ))} */}
           <button
             onClick={() => paginate(currentPage + 1)}
             disabled={currentPage === totalPages}

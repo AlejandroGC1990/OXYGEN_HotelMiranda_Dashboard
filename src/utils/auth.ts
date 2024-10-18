@@ -32,7 +32,8 @@ export const login = async (credentials: Credentials): Promise<boolean> => {
 
     const data = await response.json();
     if (data.token) {
-      Cookies.set("user", JSON.stringify(data.token), { expires: 7 }); //? Guardar token en cookies por 7 días
+      Cookies.set("user", data.token, { expires: 7 }); //? Guardar token en cookies por 7 días
+      console.log('tokenAuth', data.token)
     } else {
       console.error("Token not found in response:", data);
     }

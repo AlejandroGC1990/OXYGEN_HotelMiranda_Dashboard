@@ -1,100 +1,117 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-
-export interface Contact {
-  guest_idReview: number;           
-  guest_timeDateReview: string;     
-  guest_DateReview: string;          
-  guest_name: string;                
-  guest_email: string;               
-  guest_phone: string;              
-  guest_rateReview: number;     
-  guest_commentReview: string;    
-  guest_statusReview: string;      
-  guest_checkIn: string;       
-  guest_checkInTime: string;    
-  guest_checkOut: string;           
-  guest_checkOutTime: string;        
-  guest_orderDateTime: string;      
-  guest_orderDate: string;                  
-  guest_room_state: string;         
-}
+import { Contact } from '../../interfaces/contact';
 
 const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 const delayTime = 1500;
 
-//? Función para obtener todos los contactos
-export const fetchContacts = createAsyncThunk("contact/getAll", async () => {
+//? Función auxiliar para realizar fetch con manejo de errores
+const fetchWithDelay = async (url: string, options?: RequestInit): Promise<any> => {
   await delay(delayTime);
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/contact`);
-  
+  const response = await fetch(url, { ...options, credentials: 'include' });
+
+  //? Verifica si la respuesta es exitosa
+  const contentType = response.headers.get('Content-Type');
+  //? Log de la respuesta completa
+  const responseData = await response.text(); //? Lee la respuesta como texto
+
   if (!response.ok) {
-    throw new Error('Error al obtener los contactos');
+    const errorText = await response.text();
+    throw new Error(`Error en la solicitud: ${errorText}`);
   }
-  
-  const data: Contact[] = await response.json();
-  return data; 
-});
+
+  //? Si el contenido es JSON, devuelve los datos parseados
+  if (contentType && contentType.includes('application/json')) {
+    return JSON.parse(responseData); // Parseamos el texto como JSON si es necesario
+  }
+
+  return response;
+};
+
+//? Función para obtener todos los contactos
+export const fetchContacts = createAsyncThunk<Contact[], string>(
+  'contact/fetchContacts',
+  async (token, { rejectWithValue }) => {
+    try {
+      const url = `${import.meta.env.VITE_API_URL}/contact/`;
+      const headers = { Authorization: `Bearer ${token}` };
+      return await fetchWithDelay(url, { headers });
+    } catch (error: any) {
+      console.error('Error fetching contacts:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 //? Función para obtener un contacto por ID
-export const fetchContactById = createAsyncThunk("contact/getById", async (id: number) => {
-  await delay(delayTime);
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/contact/${id}`);
-  
-  if (!response.ok) {
-    throw new Error('Error al obtener el contacto');
+export const fetchContactById = createAsyncThunk<Contact, { id: number; token: string }>(
+  "contact/getById",
+  async ({ id, token }, { rejectWithValue }) => {
+    try {
+      const url = `${import.meta.env.VITE_API_URL}/contact/${id}`;
+      const headers = { Authorization: `Bearer ${token}` };
+      return await fetchWithDelay(url, { headers });
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
   }
-  
-  const contact: Contact = await response.json();
-  return contact; 
-});
+);
 
 //? Función para añadir un nuevo contacto
-export const addContact = createAsyncThunk("contact/add", async (newContact: Contact) => {
-  await delay(delayTime);
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/contact`, {
-    method: 'POST',
-    body: JSON.stringify(newContact),
-    headers: { 'Content-Type': 'application/json' },
-  });
-  
-  if (!response.ok) {
-    throw new Error('Error al añadir el contacto');
+export const addContact = createAsyncThunk<Contact, { newContact: Contact; token: string }>(
+  "contact/add",
+  async ({ newContact, token }, { rejectWithValue }) => {
+    try {
+      const url = `${import.meta.env.VITE_API_URL}/contact`;
+      const options = {
+        method: 'POST',
+        body: JSON.stringify(newContact),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+      };
+      return await fetchWithDelay(url, options);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
   }
-  
-  const contact: Contact = await response.json();
-  return contact; 
-});
+);
 
 //? Función para actualizar un contacto existente
-export const updateContact = createAsyncThunk(
+export const updateContact = createAsyncThunk<Contact, { updatedContact: Contact; token: string }>(
   "contact/update",
-  async (updatedContact: Contact) => {
-    await delay(delayTime);
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/contact/${updatedContact.guest_idReview}`, {
-      method: 'PUT', 
-      body: JSON.stringify(updatedContact),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    
-    if (!response.ok) {
-      throw new Error('Error al actualizar el contacto');
+  async ({ updatedContact, token }, { rejectWithValue }) => {
+    try {
+      const url = `${import.meta.env.VITE_API_URL}/contact/${updatedContact.guest_idReview}`;
+      const options = {
+        method: 'PUT',
+        body: JSON.stringify(updatedContact),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+      };
+      return await fetchWithDelay(url, options);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
     }
-    
-    const contact: Contact = await response.json();
-    return contact; 
   }
 );
 
 //? Función para eliminar un contacto
-export const deleteContact = createAsyncThunk("contact/delete", async (id: number) => {
-  await delay(delayTime);
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/contact/${id}`, {
-    method: 'DELETE',
-  });
-
-  if (!response.ok) {
-    throw new Error('Error al eliminar el contacto');
+export const deleteContact = createAsyncThunk<number, { id: number; token: string }>(
+  "contact/delete",
+  async ({ id, token }, { rejectWithValue }) => {
+    try {
+      const url = `${import.meta.env.VITE_API_URL}/contact/${id}`;
+      const options = {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      };
+      await fetchWithDelay(url, options);
+      return id;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
   }
-
-  return id; 
-});
+);
