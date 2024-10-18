@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchContacts } from "../../features/contact/contactThunk";
+import { archiveContact, fetchContacts, publishContact } from "../../features/contact/contactThunk";
 import Table from "../components/Table/Table";
 import Cookies from "js-cookie";
 import { RootState, AppDispatch } from "../../app/store";
 import { Contact as ContactType } from '../../interfaces/contact';
 import { promiseStatus } from "../../utils/promises";
+import { filterContactsByStatus } from "../../features/contact/contactSlice";
+import RecentMessages from "../components/RecentMessages/RecentMessages";
 // import { filterContactsByStatus } from "../../features/contact/contactSlice";
 
 const Contact: React.FC = () => {
@@ -15,10 +17,11 @@ const Contact: React.FC = () => {
     status,
     error
   } = useSelector((state: RootState) => state.contact);
+  const [activeTab, setActiveTab] = useState<string>('All');
 
   //? Función para obtener contactos desde el servidor
   const fetchData = async () => {
-    const token = Cookies.get('user'); 
+    const token = Cookies.get('user');
     if (token) {
       const resultAction = await dispatch(fetchContacts(token));
       if (fetchContacts.rejected.match(resultAction)) {
@@ -28,52 +31,28 @@ const Contact: React.FC = () => {
       console.error('No se encontró el token de autorización.');
     }
   };
-  // const fetchData = useCallback(async () => {
-  //   const token = Cookies.get("user");
-  //   if (!token) {
-  //     console.error("No auth token found");
-  //     return;
-  //   }
-
-  //   try {
-  //     const result = await dispatch(fetchContacts(token)); 
-  //     if (!fetchContacts.rejected.match(result)) {
-  //       console.log("Resultado de la API:", result);
-  //     } else {
-  //       console.error("Error al obtener los contactos:", result.error.message);
-  //     }
-  //   } catch (err) {
-  //     console.error("Error al obtener los contactos:", err);
-  //   }
-  // }, [dispatch]);
-
+  
   useEffect(() => {
     fetchData();
   }, []);
-  // }, [fetchData]);
-
-  // const selectors = [
-  //   { value: "All", label: "All Reviews" },
-  //   { value: "archived", label: "Archived" },
-  // ];
-
+  
   const columns: { header: string; accessor: keyof ContactType }[] = useMemo(() => [
     { header: "Order Id", accessor: "guest_idReview" },
     { header: "Date", accessor: "guest_DateReview" },
     { header: "Customer", accessor: "guest_name" },
     { header: "Comment", accessor: "guest_commentReview" },
-    // { header: "Action", accessor: "id" },
+    { header: "Action", accessor: "guest_idReview" }
   ], []);
+  
+  //? Manejar el clic para archivar
+  const handleArchiveClick = useCallback(async (id: number) => {
+    await dispatch(archiveContact({ id, token }));
+  }, [dispatch]);
 
-  // //? Función para cambiar el filtro
-  // const handleFilterChange = useCallback((newFilter: string) => {
-  //   dispatch(filterContactsByStatus(newFilter));
-  // }, [dispatch]);
-
-  // //? Manejar el clic para archivar
-  // const handleArchiveClick = useCallback((id: number) => {
-  //   console.log(`Archivar contacto con id: ${id}`);
-  // }, []);
+  //? Manejar el clic para publish
+  const handlePublishClick = useCallback(async (id: number) => {
+    await dispatch(publishContact({ id, token }));
+  }, [dispatch]);
 
   //? Renderizado personalizado de las celdas
   const renderCellContent = useCallback((item: ContactType, column: keyof ContactType) => {
@@ -105,15 +84,29 @@ const Contact: React.FC = () => {
             <span>{item.guest_commentReview}</span>
           </div>
         );
-      // case "id":
-      //   return (
-      //     <button onClick={() => handleArchiveClick(item.id)}>Archive</button>
-      //   );
+      case "guest_idReview":
+        return (
+          <>
+            <button onClick={() => handlePublishClick(item.guest_idReview)}>Publish</button>
+            <button onClick={() => handleArchiveClick(item.guest_idReview)}>Archive</button>
+          </>
+        );
       default:
         return null;
     }
-  }, []);
-  // }, [handleArchiveClick]);
+  }, [handleArchiveClick, handlePublishClick]);
+
+  //? Función para cambiar el selector de la tabla
+  const filteredContacts = useMemo(() => {
+    if (activeTab === 'Archived') {
+      return contacts.filter(contact => contact.guest_statusReview === 'archived');
+    } else if (activeTab === 'Publish') {
+      return contacts.filter(contact => contact.guest_statusReview === 'published');
+    } else {
+      return contacts; // All contacts
+    }
+  }, [contacts, activeTab]);
+
 
   if (status === promiseStatus.PENDING) return <div>Loading...</div>;
   if (status === promiseStatus.REJECTED) return <div>Error: {error}</div>;
@@ -121,15 +114,18 @@ const Contact: React.FC = () => {
   return (
     <>
       <h1>Contact</h1>
+
+      <RecentMessages contact={contacts} />
+
       <Table
         cols={columns}
         data={contacts}
         renderCellContent={renderCellContent}
-        // onFilterChange={handleFilterChange}
-        // currentFilter="All"
-        // selectors={selectors}
-        // defaultSortColumn="guest_DateReview"
-        // defaultSortDirection="desc"
+        onFilterChange={filteredContacts}
+      // currentFilter="All"
+      // selectors={selectors}
+      // defaultSortColumn="guest_DateReview"
+      // defaultSortDirection="desc"
       />
     </>
   );

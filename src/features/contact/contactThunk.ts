@@ -9,9 +9,9 @@ const fetchWithDelay = async (url: string, options?: RequestInit): Promise<any> 
   await delay(delayTime);
   const response = await fetch(url, { ...options, credentials: 'include' });
 
-  //? Verifica si la respuesta es exitosa
+  // Verifica si la respuesta es exitosa
   const contentType = response.headers.get('Content-Type');
-  //? Log de la respuesta completa
+  // Log de la respuesta completa
   const responseData = await response.text(); //? Lee la respuesta como texto
 
   if (!response.ok) {
@@ -19,7 +19,7 @@ const fetchWithDelay = async (url: string, options?: RequestInit): Promise<any> 
     throw new Error(`Error en la solicitud: ${errorText}`);
   }
 
-  //? Si el contenido es JSON, devuelve los datos parseados
+  // Si el contenido es JSON, devuelve los datos parseados
   if (contentType && contentType.includes('application/json')) {
     return JSON.parse(responseData); // Parseamos el texto como JSON si es necesario
   }
@@ -110,6 +110,49 @@ export const deleteContact = createAsyncThunk<number, { id: number; token: strin
       };
       await fetchWithDelay(url, options);
       return id;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+//? Función para archivar un contacto
+export const archiveContact = createAsyncThunk<Contact, { id: number; token: string }>(
+  "contact/archive",
+  async ({ id, token }, { rejectWithValue }) => {
+    try {
+      const url = `${import.meta.env.VITE_API_URL}/contact/${id}`;
+      const options = {
+        method: 'PATCH',
+        body: JSON.stringify({ guest_status: 'archived' }), // Solo actualizar el estado
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+      };
+      return await fetchWithDelay(url, options);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+//? Función para publicar un contacto
+export const publishContact = createAsyncThunk<Contact, { id: number; token: string }>(
+  "contact/publish",
+  async ({ id, token }, { rejectWithValue }) => {
+    try {
+      const url = `${import.meta.env.VITE_API_URL}/contact/${id}`;
+      const options = {
+        method: 'PATCH', 
+        body: JSON.stringify({ guest_status: 'published' }), // Solo actualizar el estado
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+      };
+      return await fetchWithDelay(url, options);
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
