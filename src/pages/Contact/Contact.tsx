@@ -127,7 +127,7 @@ const Contact: React.FC = () => {
     <>
       <h1>Contact</h1>
 
-      <RecentMessages contact={contacts} />
+      <RecentMessages />
 
       <Table
         cols={columns}

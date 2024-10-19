@@ -1,16 +1,14 @@
 import React from 'react';
-import { useAppDispatch } from '../../../app/store';
+import { RootState, useAppDispatch } from '../../../app/store';
 import { archiveContact, publishContact } from "../../../features/contact/contactThunk";
 import { Contact as ContactType } from '../../../interfaces/contact';
 import Cookies from 'js-cookie';
+import { useSelector } from 'react-redux';
 
-interface RecentMessagesProp {
-    contact: ContactType[];
-}
 
-const RecentMessages: React.FC<RecentMessagesProp> = ({ contact }) => {
+const RecentMessages: React.FC = () => {
     const dispatch = useAppDispatch();
-
+    const contacts: ContactType[] = useSelector((state: RootState) => state.contact.filteredContacts);
     const token = Cookies.get('user') || '';
 
     const buttonArchiveClick = async (id: number) => {
@@ -26,7 +24,7 @@ const RecentMessages: React.FC<RecentMessagesProp> = ({ contact }) => {
 
     return (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-            {contact.slice(0, 5).map((contact) => (
+            {contacts.slice(0, 5).map((contact) => (
                 <div
                     key={contact.guest_idReview}
                     style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '16px', width: '200px' }}>

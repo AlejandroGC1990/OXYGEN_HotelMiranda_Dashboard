@@ -5,9 +5,6 @@ import { useDispatch } from "react-redux";
 // import roomsReducer from "../features/rooms/roomsSlice";
 // import usersReducer from "../features/users/usersSlice";
 
-export interface RootState {
-  contact: ReturnType<typeof contactReducer>;
-}
 
 export const store = configureStore({
   reducer: {
@@ -18,5 +15,7 @@ export const store = configureStore({
   }
 });
 
+
+export type RootState = ReturnType<typeof store.getState>; //? Tipo RootState: esto define el tipo del estado global
 export type AppDispatch = typeof store.dispatch;
 export const useAppDispatch = () => useDispatch<AppDispatch>();
