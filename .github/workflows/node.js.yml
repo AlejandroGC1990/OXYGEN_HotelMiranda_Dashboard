@@ -29,3 +29,14 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     # - run: npm test
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: 'us-east-1'  # Cambia la región de AWS según tu configuración
+
+    
+    - name: Sync repository to S3
+      run: |
+        aws s3 sync . s3://agc-oxygen-hotel-miranda-dashboard/ --exclude ".git/" --exclude ".github/" --delete
