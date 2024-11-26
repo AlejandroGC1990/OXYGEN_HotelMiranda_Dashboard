@@ -16,11 +16,11 @@ import { Contact } from '../../interfaces/contact';
 //? Estado inicial para el slice de contactos
 export interface ContactState {
   pending: boolean;
-  contacts: Contact[];               //? Lista de todos los contactos
-  selectedContact: Contact | null;    //? Contacto seleccionado para ver detalles
-  filteredContacts: Contact[];       //? Contactos filtrados por estado
-  status: promiseStatus;             //? Estado de la promesa (IDLE, PENDING, FULFILLED, REJECTED)
-  error: string | null;              //? Mensaje de error, si existe
+  contacts: Contact[];                       //? Lista de todos los contactos
+  selectedContact: Contact | null;           //? Contacto seleccionado para ver detalles
+  filteredContacts: Contact[];               //? Contactos filtrados por estado
+  status: promiseStatus;                     //? Estado de la promesa (IDLE, PENDING, FULFILLED, REJECTED)
+  error: '' | 'archived' | 'publish' | null; //? Mensaje de error, si existe
 }
 
 const initialState: ContactState = {
@@ -37,10 +37,10 @@ const contactSlice = createSlice({
   initialState,
   reducers: {
     //? Reducer para filtrar contactos por estado
-    filterContactsByStatus: (state, action: PayloadAction<string>) => {
+    filterContactsByStatus: (state, action: PayloadAction<'' | 'archived' | 'publish'>) => {
       const status = action.payload;
       state.filteredContacts = state.contacts.filter((contact) =>
-        contact.guest_statusReview === status || status === "All"
+        contact.guest_statusReview === status || status === ''
       );
     },
   },
@@ -60,7 +60,7 @@ const contactSlice = createSlice({
       })
       .addCase(fetchContacts.rejected, (state, action) => {
         state.status = promiseStatus.REJECTED;
-        state.error = action.error.message || null; //? Capturar el mensaje de error
+        state.error = action.error.message === 'archived' || action.error.message === 'publish' ? action.error.message : null; //? Capturar el mensaje de error
         state.pending = false;
       })
       //? Manejo de la acción para obtener un contacto por ID
@@ -94,18 +94,46 @@ const contactSlice = createSlice({
         state.filteredContacts = state.filteredContacts.filter(contact => contact.guest_idReview !== action.payload); //? También filtrar de los contactos filtrados
       })
       //?Para cambiar el estado de guest_statusReview
+      // .addCase(archiveContact.fulfilled, (state, action) => {
+      //   const { guest_idReview } = action.payload;
+      //   const contact = state.contacts.find(contact => contact.guest_idReview === guest_idReview);
+      //   if (contact) {
+      //     contact.guest_statusReview = 'archived';
+      //   }
+      // })
       .addCase(archiveContact.fulfilled, (state, action) => {
         const { guest_idReview } = action.payload;
-        const contact = state.contacts.find(contact => contact.guest_idReview === guest_idReview);
-        if (contact) {
-          contact.guest_statusReview = 'archived';
+        const contactIndex = state.contacts.findIndex(contact => contact.guest_idReview === guest_idReview);
+        if (contactIndex !== -1) {
+          //? Crear una copia del contacto y actualiza el estado
+          const updatedContact = {
+            ...state.contacts[contactIndex],
+            guest_statusReview: 'archived' as 'archived'
+          };
+          state.contacts[contactIndex] = updatedContact;
+          //? Actualizar filteredContacts si es necesario
+          const filteredIndex = state.filteredContacts.findIndex(contact => contact.guest_idReview === guest_idReview);
+          if (filteredIndex !== -1) {
+            state.filteredContacts[filteredIndex] = updatedContact;
+          }
         }
       })
       .addCase(publishContact.fulfilled, (state, action) => {
         const { guest_idReview } = action.payload;
-        const contact = state.contacts.find(contact => contact.guest_idReview === guest_idReview);
-        if (contact) {
-          contact.guest_statusReview = 'publish';
+        const contactIndex = state.contacts.findIndex(contact => contact.guest_idReview === guest_idReview);
+        if (contactIndex !== -1) {
+
+          const updatedContact = {
+            ...state.contacts[contactIndex],
+            guest_statusReview: 'publish' as 'publish'  //? Especifica el tipo exacto
+          };
+          state.contacts[contactIndex] = updatedContact;
+
+          const filteredIndex = state.filteredContacts.findIndex(contact => contact.guest_idReview === guest_idReview);
+
+          if (filteredIndex !== -1) {
+            state.filteredContacts[filteredIndex] = updatedContact;
+          }
         }
       });
   },

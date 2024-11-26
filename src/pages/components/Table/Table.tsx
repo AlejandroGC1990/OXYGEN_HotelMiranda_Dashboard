@@ -98,7 +98,8 @@ const Tabla = <T,>({
   renderCellContent,
   selectors,
   currentFilter,
-  setFilter
+  setFilter,
+  keyAccessor
 }: {
   cols: { header: string; accessor: keyof T }[];
   data: T[];
@@ -106,6 +107,7 @@ const Tabla = <T,>({
   selectors: { label: string; value: string }[];
   currentFilter: string;
   setFilter: (filter: string) => void; 
+  keyAccessor: (item: T) => number;
 }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [recordsPerPage] = useState<number>(10);
@@ -184,11 +186,11 @@ const Tabla = <T,>({
             </tr>
           </thead>
           <tbody>
-            {currentRecords.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {cols.map((cols) => (
-                  <td key={`${String(cols.accessor)}-${rowIndex}`}>
-                    {renderCellContent(row, cols.accessor)}
+            {currentRecords.map((row) => (
+              <tr key={keyAccessor(row)}> {/* Uso del keyAccessor aquí */}
+                {cols.map((col) => (
+                  <td key={`${String(col.accessor)}-${row[cols[0].accessor]}`}>
+                    {renderCellContent(row, col.accessor)}
                   </td>
                 ))}
               </tr>

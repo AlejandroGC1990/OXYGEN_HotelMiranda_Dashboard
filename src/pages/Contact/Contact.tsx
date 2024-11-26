@@ -74,7 +74,7 @@ const Contact: React.FC = () => {
     { header: "Date", accessor: "guest_DateReview" },
     { header: "Customer", accessor: "guest_name" },
     { header: "Comment", accessor: "guest_commentReview" },
-    { header: "Action", accessor: "guest_idReview" }
+    { header: "Action", accessor: "action" }
   ], []);
 
   //? Renderizado personalizado de las celdas
@@ -107,7 +107,7 @@ const Contact: React.FC = () => {
             <span>{item.guest_commentReview}</span>
           </div>
         );
-      case "guest_idReview":
+      case "action":
         return (
           <>
             <button onClick={() => handlePublishClick(item.guest_idReview)}>Publish</button>
@@ -136,6 +136,7 @@ const Contact: React.FC = () => {
         currentFilter={filter}
         setFilter={setFilter}
         selectors={selectors}
+        keyAccessor={(item) => item.guest_idReview}
       />
     </>
   );

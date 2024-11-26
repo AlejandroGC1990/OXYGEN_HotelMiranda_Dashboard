@@ -11,12 +11,11 @@ const fetchWithDelay = async (url: string, options?: RequestInit): Promise<any> 
 
   // Verifica si la respuesta es exitosa
   const contentType = response.headers.get('Content-Type');
-  // Log de la respuesta completa
   const responseData = await response.text(); //? Lee la respuesta como texto
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Error en la solicitud: ${errorText}`);
+    // const errorText = await response.text();
+    throw new Error(`Error en la solicitud: ${responseData}`);
   }
 
   // Si el contenido es JSON, devuelve los datos parseados

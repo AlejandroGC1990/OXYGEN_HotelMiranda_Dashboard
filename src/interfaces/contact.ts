@@ -14,5 +14,6 @@ export interface Contact {
     guest_checkOutTime: string;        
     guest_orderDateTime: string;      
     guest_orderDate: string;                  
-    guest_room_state: string;         
+    guest_room_state: string;       
+    action?: string;  
 }
