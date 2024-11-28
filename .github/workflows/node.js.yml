@@ -39,4 +39,4 @@ jobs:
     
     - name: Sync repository to S3
       run: |
-        aws s3 sync ./dist s3://agc-oxygen-hotel-miranda-dashboard/ --exclude ".git/" --exclude ".github/" --delete
+        aws s3 sync ./dist s3://agc-oxygen-hotelmiranda-dashboard/ --exclude ".git/" --exclude ".github/" --delete
